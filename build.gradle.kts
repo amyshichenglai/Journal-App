@@ -22,6 +22,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.3.5") // Update to Ktor version 2.3.5
     implementation("io.ktor:ktor-client-cio:2.3.5") // Update to Ktor version 2.3.5
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10") // Update to Kotlin 1.9.10 and JDK 8 variant
+
 }
 
 compose.desktop {
