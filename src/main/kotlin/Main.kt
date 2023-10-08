@@ -28,13 +28,6 @@ fun Calendar() {
     Text("Calendar")
 }
 
-
-
-@Composable
-fun ToDoList() {
-    Text("This is the To-Do-List content")
-}
-
 @Composable
 fun BoxItem(color: Color, text: String) {
     Box(modifier = Modifier.size(200.dp, 200.dp).background(color)) {
