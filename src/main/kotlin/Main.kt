@@ -43,23 +43,24 @@ fun Notes() {
 fun AppLayout() {
     val (selectedSection, setSelectedSection) = remember { mutableStateOf("Section 1") }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Button(onClick = { setSelectedSection("Calendar") }, modifier = Modifier.weight(1f).padding(16.dp)) {
-            Text("Calendar")
-        }
-        Button(onClick = { setSelectedSection("Summary") }, modifier = Modifier.weight(1f).padding(16.dp)) {
-            Text("Summary")
-        }
-        Button(onClick = { setSelectedSection("To-Do-List") }, modifier = Modifier.weight(1f).padding(16.dp)) {
-            Text("To-Do-List")
-        }
-        Button(onClick = { setSelectedSection("Notes") }, modifier = Modifier.weight(1f).padding(16.dp)) {
-            Text("Notes")
-        }
 
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = { setSelectedSection("Calendar") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+                Text("Calendar")
+            }
+            Button(onClick = { setSelectedSection("Summary") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+                Text("Summary")
+            }
+            Button(onClick = { setSelectedSection("To-Do-List") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+                Text("To-Do-List")
+            }
+            Button(onClick = { setSelectedSection("Notes") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+                Text("Notes")
+            }
+        }
         Box(
             modifier = Modifier.weight(3f).fillMaxWidth(),
             contentAlignment = Alignment.Center
@@ -73,7 +74,7 @@ fun AppLayout() {
             }
         }
     }
-}
+
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
