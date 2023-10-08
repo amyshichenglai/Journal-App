@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-
-fun main(args : Array<String>) {
-    println("Hello, World!")
-}
-=======
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,18 +21,14 @@ import androidx.compose.ui.window.application
 
 
 
+
 // Sample Composable functions for each section
 @Composable
 fun Calendar() {
     Text("Calendar")
 }
 
-@Composable
-fun Summary() {
-    Text("This is the Summary content")
-    Text("SDHJDAJSHDhasjdhjahsdas")
-    Text("ha")
-}
+
 
 @Composable
 fun ToDoList() {
@@ -82,6 +72,9 @@ fun AppLayout() {
 //            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            Button(onClick = { setSelectedSection("Home") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+                Text("Home")
+            }
             Button(onClick = { setSelectedSection("Calendar") }, modifier = Modifier.weight(1f).padding(16.dp)) {
                 Text("Calendar")
             }
@@ -100,6 +93,7 @@ fun AppLayout() {
             contentAlignment = Alignment.Center
         ) {
             when (selectedSection) {
+                "Home" -> MagicHome()
                 "Calendar" -> Calendar()
                 "Summary" -> Summary()
                 "To-Do-List" -> ToDoList()
@@ -117,4 +111,4 @@ fun main() = application {
         }
     }
 }
->>>>>>> 7985031 (add right pane)
+

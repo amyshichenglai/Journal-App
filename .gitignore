@@ -3,6 +3,9 @@
 .AppleDouble
 .LSOverride
 
+.gradle/
+build/
+
 # Icon must end with two \r
 Icon
 
