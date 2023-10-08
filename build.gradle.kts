@@ -1,8 +1,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm")
-    id("org.jetbrains.compose")
+    kotlin("jvm") version "1.9.10" // Update to Kotlin Compiler 1.9.10
+    id("org.jetbrains.compose") version "1.5.1" // Update to Compose version 1.5.1
 }
 
 group = "com.example"
@@ -17,13 +17,12 @@ repositories {
 val ktor_version: String by project
 
 dependencies {
-    // Note, if you develop a library, you should use compose.desktop.common.
-    // compose.desktop.currentOs should be used in launcher-sourceSet
-    // (in a separate module for demo project and in testMain).
-    // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.vavr:vavr:0.10.4")
+    implementation("io.ktor:ktor-client-core:2.3.5") // Update to Ktor version 2.3.5
+    implementation("io.ktor:ktor-client-cio:2.3.5") // Update to Ktor version 2.3.5
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10") // Update to Kotlin 1.9.10 and JDK 8 variant
+
 }
 
 compose.desktop {
