@@ -37,6 +37,7 @@ fun Calendar() {
 fun Summary() {
     Text("This is the Summary content")
     Text("SDHJDAJSHDhasjdhjahsdas")
+    Text("hi")
 }
 
 @Composable
