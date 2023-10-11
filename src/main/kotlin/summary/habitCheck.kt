@@ -2,7 +2,6 @@
 package summary
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -12,9 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -56,7 +52,6 @@ fun HabitCheck(habit: String) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Set the canvas background color to Transparent
             drawRect(
                 color = Color.Transparent,
                 size = size
@@ -65,13 +60,13 @@ fun HabitCheck(habit: String) {
                 if (complete[index]) {
                     drawCircle(
                         color = Color.Blue,
-                        radius = 30f, // Adjust the radius as needed
+                        radius = 30f,
                         center = position
                     )
                 } else {
                     drawCircle(
                         color = Color.Gray,
-                        radius = 30f, // Adjust the radius as needed
+                        radius = 30f,
                         center = position
                     )
                 }
