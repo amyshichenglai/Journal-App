@@ -10,13 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import java.time.LocalDate
-import java.util.*
-
+import summary.*
+import androidx.compose.ui.window.*
+import java.awt.Dimension
 
 // Sample Composable functions for each section
 
@@ -35,7 +32,8 @@ fun MagicHome() {
     ) {
         items(4) { index ->
             when (index) {
-                0 -> BoxItem(Color.Red, "Summary section")
+                0 -> HomeSummary()
+//                0 -> BoxItem(Color.Red, "Summary section")
                 1 -> BoxItem(Color.Yellow, "Calendar section")
                 2 -> BoxItem(Color.Blue, "Todo section")
                 3 -> BoxItem(Color.Green, "Notes section")
@@ -90,7 +88,11 @@ fun AppLayout() {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    val window = Window(
+        onCloseRequest = ::exitApplication,
+        title = "Your App Title"
+    ) {
+        window.minimumSize = Dimension(1000, 700)
         MaterialTheme {
             AppLayout()
         }
