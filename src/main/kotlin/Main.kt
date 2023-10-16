@@ -1,9 +1,9 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,6 +14,18 @@ import androidx.compose.ui.unit.dp
 import summary.*
 import androidx.compose.ui.window.*
 import java.awt.Dimension
+import androidx.compose.desktop.DesktopMaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.material3.*
+import androidx.compose.*
+import androidx.compose.ui.draw.*
+import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.unit.sp
 
 // Sample Composable functions for each section
 
@@ -23,6 +35,7 @@ fun BoxItem(color: Color, text: String) {
         Text(text)
     }
 }
+
 @Composable
 fun MagicHome() {
     LazyColumn(
@@ -34,7 +47,7 @@ fun MagicHome() {
             when (index) {
                 0 -> HomeSummary()
 //                0 -> BoxItem(Color.Red, "Summary section")
-                1 -> BoxItem(Color.Yellow, "Calendar section")
+                1 -> BoxItem(Color.Yellow, "Calendr section")
                 2 -> BoxItem(Color.Blue, "Todo section")
                 3 -> BoxItem(Color.Green, "Notes section")
             }
@@ -53,27 +66,48 @@ fun AppLayout() {
     Row() {
         Column(
 //            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
+            //verticalArrangement = Arrangement.SpaceBetween
+
+            verticalArrangement = Arrangement.SpaceBetween, // Controls vertical arrangement
+            horizontalAlignment = Alignment.CenterHorizontally, // Controls horizontal alignment
+            modifier = Modifier.fillMaxHeight()
+
         ) {
-            Button(onClick = { setSelectedSection("Home") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+            val commonButtonModifier = Modifier
+                .weight(1f)
+                .padding(14.dp)
+                .size(width = 150.dp, height = 1000.dp)
+            Button(
+                onClick = { setSelectedSection("Home") }, modifier = commonButtonModifier
+            ) {
                 Text("Home")
             }
-            Button(onClick = { setSelectedSection("Calendar") }, modifier = Modifier.weight(1f).padding(16.dp)) {
-                Text("Calendar")
+            FilledTonalButton(
+                onClick = { setSelectedSection("Calendar") }, modifier = commonButtonModifier
+            ) {
+                Text(
+                    text = "Calendar"
+                )
             }
-            Button(onClick = { setSelectedSection("Summary") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+            FilledTonalButton(
+                onClick = { setSelectedSection("Summary") }, modifier = commonButtonModifier
+            ) {
                 Text("Summary")
             }
-            Button(onClick = { setSelectedSection("To-Do-List") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+            FilledTonalButton(
+                onClick = { setSelectedSection("To-Do-List") }, modifier = commonButtonModifier
+            ) {
                 Text("To-Do-List")
             }
-            Button(onClick = { setSelectedSection("Notes") }, modifier = Modifier.weight(1f).padding(16.dp)) {
+            FilledTonalButton(
+                onClick = { setSelectedSection("Notes") }, modifier = commonButtonModifier
+            ) {
                 Text("Notes")
             }
+
         }
         Box(
-            modifier = Modifier.weight(3f).fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.weight(3f).fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             when (selectedSection) {
                 "Home" -> MagicHome()
@@ -89,10 +123,9 @@ fun AppLayout() {
 
 fun main() = application {
     val window = Window(
-        onCloseRequest = ::exitApplication,
-        title = "Your App Title"
+        onCloseRequest = ::exitApplication, title = "Your App Title"
     ) {
-        window.minimumSize = Dimension(1000, 700)
+        window.minimumSize = Dimension(1200, 700)
         MaterialTheme {
             AppLayout()
         }

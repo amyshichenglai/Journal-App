@@ -1,7 +1,10 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
     kotlin("jvm") version "1.9.0"
     id("org.jetbrains.compose") version "1.5.3"
 }
+
 
 repositories {
     mavenCentral()
@@ -10,7 +13,9 @@ repositories {
 }
 
 dependencies {
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.currentOs);
+    implementation("org.jetbrains.compose.material3:material3-desktop:1.2.1")
+
 }
 
 compose.desktop {
