@@ -5,7 +5,6 @@ plugins {
     id("org.jetbrains.compose") version "1.5.3"
 }
 
-
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -15,9 +14,7 @@ repositories {
 dependencies {
     implementation(compose.desktop.currentOs);
     implementation("org.jetbrains.compose.material3:material3-desktop:1.2.1")
-
 }
-
 compose.desktop {
     application {
         mainClass = "MainKt"

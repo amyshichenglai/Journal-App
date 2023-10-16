@@ -46,8 +46,7 @@ fun MagicHome() {
         items(4) { index ->
             when (index) {
                 0 -> HomeSummary()
-//                0 -> BoxItem(Color.Red, "Summary section")
-                1 -> BoxItem(Color.Yellow, "Calendr section")
+                1 -> BoxItem(Color.Yellow, "Calendar section")
                 2 -> BoxItem(Color.Blue, "Todo section")
                 3 -> BoxItem(Color.Green, "Notes section")
             }
