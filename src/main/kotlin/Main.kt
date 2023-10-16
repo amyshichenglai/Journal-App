@@ -3,7 +3,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import ui.theme.AppTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +48,9 @@ fun MagicHome() {
         items(4) { index ->
             when (index) {
                 0 -> HomeSummary()
-                1 -> BoxItem(Color.Yellow, "Calendar section")
-                2 -> BoxItem(Color.Blue, "Todo section")
-                3 -> BoxItem(Color.Green, "Notes section")
+//                1 -> BoxItem(Color.Yellow, "Calendar section")
+//                2 -> BoxItem(Color.Blue, "Todo section")
+//                3 -> BoxItem(Color.Green, "Notes section")
             }
         }
     }
@@ -125,7 +127,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication, title = "Your App Title"
     ) {
         window.minimumSize = Dimension(1200, 700)
-        MaterialTheme {
+        AppTheme {
             AppLayout()
         }
     }

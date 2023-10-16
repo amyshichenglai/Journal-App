@@ -78,5 +78,5 @@ fun SimpleCalendar(month: Int, year: Int) {
 
 @Composable
 fun Calendar() {
-    SimpleCalendar(10,2023)
+    SimpleCalendar(10, 2023)
 }
