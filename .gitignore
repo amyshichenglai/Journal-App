@@ -27,3 +27,12 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Ignore Gradle files
+.gradle/
+
+# Ignore specific IDEA files
+.idea/workspace.xml
+
+# Ignore Kotlin build files
+build/kotlin/
