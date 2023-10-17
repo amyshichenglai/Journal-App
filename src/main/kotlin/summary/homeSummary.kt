@@ -2,7 +2,9 @@ package summary
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -15,9 +17,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.*
+import androidx.compose.material.Button
+import androidx.compose.runtime.*
+import java.time.format.DateTimeFormatter
+import androidx.compose.foundation.background
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.border
+import java.time.LocalDate
 
 //barchart
 //https://github.com/developerchunk/BarGraph-JetpackCompose/tree/main/app/src/main/java/com/example/customchar
+
+@Composable
+fun DailyCalendar(date: Int, month: Int, year: Int) {
+    val selectedDate = LocalDate.of(year, month, date)
+    val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        // Display the date
+        Text(text = dateFormatter.format(selectedDate), fontSize = 24.sp)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Display the hours of the day
+        (0..23).forEach { hour ->
+            Text(
+                text = "${if (hour < 10) "0$hour" else hour}:00",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
+    }
+}
 
 @Composable
 fun ButtonBox(date: String? = null, time: String? = null) {
@@ -26,18 +61,31 @@ fun ButtonBox(date: String? = null, time: String? = null) {
             .clip(RoundedCornerShape(8.dp))
             .height(50.dp)
             .width(250.dp)
-            .background(MaterialTheme.colorScheme.primary), // A more muted shade of blue
+            .background(MaterialTheme.colorScheme.background), // A more muted shade of blue
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = date ?: time ?: "",
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            style = MaterialTheme.typography.headlineMedium
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
+
+
+@Composable
+fun homeCalendar() {
+    Box(
+        modifier = Modifier
+            .size(250.dp, 400.dp) // Adjust these values as per your desired size
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.errorContainer), // Optional: If you want a background color
+        contentAlignment = Alignment.TopStart
+    ) {
+        DailyCalendar(date = 14, month = 10, year = 2023)
+    }
+}
+
 
 @Composable
 fun HomeSummary() {
@@ -56,7 +104,7 @@ fun HomeSummary() {
 //                .aspectRatio(3f)
                 .fillMaxSize(0.65f)
                 .height(175.dp)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
 //            contentAlignment = Alignment.Center
         ) {
             Column(
@@ -156,10 +204,18 @@ fun HomeSummary() {
                             .padding(10.dp)
                             .height(20.dp)
                             .fillMaxWidth()
+
+
                     )
+
+
                 }
+
             }
+
         }
+
+
     }
 }
 
