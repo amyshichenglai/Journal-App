@@ -8,6 +8,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,7 +26,7 @@ fun ReportTypeSelection(selectedSection: String, onSelectedSectionChanged: (Stri
                 OutlinedButton(
                     onClick = { expanded = true },
                 ) {
-                    Text(selectedSection)
+                    Text(selectedSection, color = MaterialTheme.colorScheme.primary)
                 }
                 DropdownMenu(
                     expanded = expanded,

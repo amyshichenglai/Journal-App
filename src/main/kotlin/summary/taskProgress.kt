@@ -3,9 +3,9 @@ package summary
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,20 +23,37 @@ fun TaskProgress(
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            backgroundColor = Color.White,
+            backgroundColor = MaterialTheme.colorScheme.onSecondary,
+            color = MaterialTheme.colorScheme.primary,
             progress = progress,
             modifier = Modifier.size(200.dp),
             strokeWidth = 12.dp
         )
-
+        Column (
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ){
             Text(
                 text = "Task Progress",
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.primary,
                 style = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            var tem_str = (progress * 100).toString() + "%"
+            Text(
+                text = "${tem_str}",
+                color = MaterialTheme.colorScheme.primary,
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+            )
+        }
+
 
     }
 }

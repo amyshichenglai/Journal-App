@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontFamily
 
 var Date1 = "10"
@@ -43,7 +44,7 @@ fun Summary() {
                     .clip(RoundedCornerShape(8.dp))
                     .height(100.dp)
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
                 when (selectedSection) {
@@ -52,7 +53,8 @@ fun Summary() {
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
 
                     "Monthly" -> Text(
@@ -60,7 +62,8 @@ fun Summary() {
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
 
                     "Annual" -> Text(
@@ -68,7 +71,8 @@ fun Summary() {
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -166,13 +170,14 @@ fun Summary() {
                             .clip(RoundedCornerShape(8.dp))
                             .height(40.dp)
                             .width(200.dp)
-                            .background(Color.Blue),
+                            .background(MaterialTheme.colorScheme.tertiary),
                         contentAlignment = Alignment.Center,
                         content = {
                             Text(
                                 text = "$habit Completed",
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.Normal
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onTertiary
                             )
                         }
                     )

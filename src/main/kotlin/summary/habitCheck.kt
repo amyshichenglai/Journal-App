@@ -7,12 +7,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+//import androidx.compose.ui.draw.EmptyBuildDrawCacheParams.size
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Shape
+//import androidx.compose.material3.md.sys.shape.corner.full.Circular
+import androidx.compose.ui.draw.drawBehind
+import java.awt.Color.red
+
 
 @Composable
 fun HabitCheck(habit: String) {
@@ -47,39 +54,32 @@ fun HabitCheck(habit: String) {
             false,
             false
         )
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            drawRect(
-                color = Color.Transparent,
-                size = size
-            )
-            circlePositions.forEachIndexed { index, position ->
-                if (complete[index]) {
-                    drawCircle(
-                        color = Color.Blue,
-                        radius = 30f,
-                        center = position
-                    )
-                } else {
-                    drawCircle(
-                        color = Color.Gray,
-                        radius = 30f,
-                        center = position
-                    )
-                }
-
-            }
-
-        }
-        circlePositions.forEachIndexed { index, position ->
+        val radius = 30f
+        circlePositions.forEachIndexed {index, position ->
             Text(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .offset(position.x.dp, y=position.y.dp)
+                    .drawBehind {
+                        if (complete[index]) {
+                            drawCircle(
+                                color = Color(0xFF476810), //primary
+                                radius = radius
+                            )
+                        } else {
+                            drawCircle(
+                                color = Color(0xFFC5C8B9),
+                                radius = radius
+                            )
+                        }
+                    },
                 text = Weekday[index],
-                modifier = Modifier.offset(x = position.x.dp-2.dp, y = position.y.dp+3.dp),
-                fontSize = 16.sp,
-                color = Color.Black
+                color =
+                    if (complete[index]) {
+                        Color(0xFFFFFFFF)//onPrimary
+                    } else {
+                        Color.Black
+                }
             )
         }
     }
