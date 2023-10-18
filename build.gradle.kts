@@ -1,5 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     kotlin("jvm") version "1.9.0"
     id("org.jetbrains.compose") version "1.5.3"
@@ -8,6 +6,7 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://github.com/MohamedRejeb/Compose-Rich-Editor")
     google()
 }
 

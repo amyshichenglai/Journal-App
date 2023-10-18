@@ -32,6 +32,8 @@ import ui.theme.md_theme_light_background
 import note.*
 // Sample Composable functions for each section
 
+import note.*
+
 @Composable
 fun BoxItem(color: Color, text: String) {
     Box(modifier = Modifier.size(200.dp, 200.dp).background(color)) {
