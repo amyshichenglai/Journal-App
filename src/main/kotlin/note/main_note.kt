@@ -121,8 +121,6 @@ fun NoteList() {
                     containerColor = backgroundColor
                 ),
                 shape = RoundedCornerShape(8.dp),
-
-
             ) {
                 Row (modifier = Modifier
                     .clickable { selectedNoteIndex.value = it }
@@ -130,8 +128,8 @@ fun NoteList() {
                     .clip(RoundedCornerShape(8.dp))
                 ) {
                     Icon(
-                        Icons.Filled.Edit,
-                        contentDescription = "Localized description",
+                        Icons.Filled.Edit, // icon image
+                        contentDescription = "A Pen",
                         modifier = Modifier
                             .clickable {  }
                             .align(Alignment.CenterVertically)
@@ -145,8 +143,7 @@ fun NoteList() {
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(5.dp))
-
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
