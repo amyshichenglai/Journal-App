@@ -29,8 +29,10 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.sp
 import ui.theme.md_theme_light_background
-
+import note.*
 // Sample Composable functions for each section
+
+import note.*
 
 @Composable
 fun BoxItem(color: Color, text: String) {
@@ -59,7 +61,7 @@ fun MagicHome() {
 
 @Composable
 fun Notes() {
-    Text("This is the Notes content")
+    NotesEditor()
 }
 
 @Composable
@@ -125,13 +127,11 @@ fun AppLayout() {
 
 fun main() = application {
     val window = Window(
-        onCloseRequest = ::exitApplication, title = "Journaling App"
+        onCloseRequest = ::exitApplication, title = "Your App Title"
     ) {
         window.minimumSize = Dimension(1200, 700)
-
         AppTheme {
             AppLayout()
-
         }
     }
 }
