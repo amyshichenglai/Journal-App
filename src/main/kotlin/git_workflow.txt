@@ -1,9 +1,13 @@
 GIT instructions
 When main branch is updated:
  git add, commit, push to YOUR OWN remote feature branch
+ go to local main branch
  git fetch origin
- git rebase origin/main
- go through all the conflicts if there is any
+ git pull
+ go back to local feature branch (if you can't switch branch git add . + git commit)
+ git add, commit
+ git rebase main (go through all the conflicts if there is any, then git rebase origin/main --continue )
+
 To submit merge request:
  git add, commit, push to YOUR OWN remote feature branch
  go onto gitlab and send a merge request: Jude <-> Sean, Sherlock <-> Amy, target branch is main
