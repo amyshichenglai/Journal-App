@@ -1,36 +1,25 @@
 package note
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.material.Text
-import androidx.compose.ui.text.font.FontFamily
-import java.time.format.TextStyle
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.*
-import androidx.compose.foundation.text.selection.*
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 
 @Composable
 fun DocumentToolbar(
-    onOpen: () -> Unit,
-    onSave: () -> Unit,
+    onPlain: () -> Unit,
+    onBold: () -> Unit,
+    onItalic: () -> Unit,
     onUndo: () -> Unit,
     onRedo: () -> Unit
 ) {
@@ -38,17 +27,20 @@ fun DocumentToolbar(
         modifier = Modifier.fillMaxWidth().padding(8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(onClick = onOpen) {
-            Text("Open")
+        TextButton(onClick = onPlain, modifier = Modifier.focusable(false)) {
+            Text("Plain")
         }
-        Button(onClick = onSave) {
-            Text("Save")
+        TextButton(onClick = onBold, modifier = Modifier.focusable(false)) {
+            Text("Bold")
+        }
+        TextButton(onClick = onItalic, modifier = Modifier.focusable(false)) {
+            Text("Italic")
         }
          // Adds some space between buttons
-        Button(onClick = onUndo) {
+        TextButton(onClick = onUndo, modifier = Modifier.focusable(false)) {
             Text("Undo")
         }
-        Button(onClick = onRedo) {
+        TextButton(onClick = onRedo, modifier = Modifier.focusable(false)) {
             Text("Redo")
         }
     }
@@ -56,18 +48,24 @@ fun DocumentToolbar(
 
 @Composable
 fun NotesEditor() {
-    var text by remember { mutableStateOf("") }
 
-
+    val state = rememberRichTextState()
+    val focusRequester = remember { FocusRequester() }
     Box(
         modifier = Modifier.fillMaxSize().padding(14.dp),
         // contentAlignment = Alignment.TopStart
     ) {
         DocumentToolbar(
-            onOpen = {
-                     //
+            onPlain = {
+                state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Normal))
+                state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Normal))
             },
-            onSave = {
+            onBold = {
+                state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Normal))
+            },
+            onItalic = {
+                state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
             },
             onUndo = {
                 // Implement undo functionality
@@ -77,15 +75,11 @@ fun NotesEditor() {
             }
         )
 
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            textStyle = TextStyle(fontSize = 18.sp),
-            maxLines = Int.MAX_VALUE, // Allow multiple lines
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        // Toggle a span style.
+        RichTextEditor(
+            state = state,
             modifier = Modifier.fillMaxSize().padding(top = 55.dp),
-            label = { Text("Label") }
-
         )
     }
 }
+
