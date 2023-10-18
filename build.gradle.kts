@@ -11,9 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03") {
-        exclude(group = "org.jetbrains.compose.material3", module = "material3-desktop")
-    }
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
     implementation(compose.desktop.currentOs);
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.3")
 }
