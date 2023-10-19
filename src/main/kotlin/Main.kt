@@ -127,7 +127,7 @@ fun AppLayout() {
 
 fun main() = application {
     val window = Window(
-        onCloseRequest = ::exitApplication, title = "Your App Title"
+        onCloseRequest = ::exitApplication, title = "My Journal"
     ) {
         window.minimumSize = Dimension(1200, 700)
         AppTheme {
