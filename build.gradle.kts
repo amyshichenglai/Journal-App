@@ -1,3 +1,5 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
     kotlin("jvm") version "1.9.0"
     id("org.jetbrains.compose") version "1.5.3"
@@ -11,10 +13,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
     implementation(compose.desktop.currentOs);
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.3")
-    implementation("com.darkrockstudios:richtexteditor:1.4.1")
 }
 compose.desktop {
     application {
