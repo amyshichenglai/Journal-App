@@ -46,12 +46,12 @@ fun MagicHome() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
         items(4) { index ->
             when (index) {
                 0 -> HomeSummary()
-//                1 -> BoxItem(Color.Yellow, "Calendar section")
+                1 -> homeCalendar()
 //                2 -> BoxItem(Color.Blue, "Todo section")
 //                3 -> BoxItem(Color.Green, "Notes section")
             }
