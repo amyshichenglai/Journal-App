@@ -14,6 +14,7 @@ dependencies {
     implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
     implementation(compose.desktop.currentOs);
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.3")
+    implementation("com.darkrockstudios:richtexteditor:1.4.1")
 }
 compose.desktop {
     application {
