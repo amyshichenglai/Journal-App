@@ -85,13 +85,13 @@ fun Summary() {
         }
 
         item {
-                when (selectedSection) {
-                    "Weekly" -> LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                    ) {
-                        item{
-                            Chart(
+            when (selectedSection) {
+                "Weekly" -> LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    item {
+                        Chart(
 
                             data = mapOf(
 
@@ -105,54 +105,53 @@ fun Summary() {
 
 
                                 ), barwidth = 30.dp, graphWidth = 530.dp, max_value = 1
-                        )}
-                        item {
-                            Column {
-                                HabitSelection(habit) { newSection ->
-                                    habit = newSection
-                                }
-                                HabitCheck(habit)
+                        )
+                    }
+                    item {
+                        Column {
+                            HabitSelection(habit) { newSection ->
+                                habit = newSection
                             }
-
+                            HabitCheck(habit)
                         }
-
 
                     }
 
 
-                    "Monthly" -> Chart(
-
-                        data = mapOf(
-
-                            Pair("Week1", 0.1f),
-                            Pair("Week2", 0.2f),
-                            Pair("Week3", 0.3f),
-                            Pair("Week4", 0.4f),
-
-                            ), barwidth = 50.dp, graphWidth = 530.dp, max_value = 1
-                    )
-
-                    "Annual" -> Chart(
-
-                        data = mapOf(
-
-                            Pair("Jan", 0.1f),
-                            Pair("Feb", 0.2f),
-                            Pair("Mar", 0.3f),
-                            Pair("Apr", 0.4f),
-                            Pair("May", 0.5f),
-                            Pair("Jun", 0.6f),
-                            Pair("Jul", 0.7f),
-                            Pair("Aug", 0.7f),
-                            Pair("Sep", 0.7f),
-                            Pair("Oct", 0.7f),
-                            Pair("Nov", 0.7f),
-                            Pair("Dec", 0.7f),
-
-                            ), barwidth = 30.dp, graphWidth = 900.dp,max_value = 1
-                    )
                 }
+
+
+                "Monthly" -> Chart(
+
+                    data = mapOf(
+                        Pair("Week1", 0.1f),
+                        Pair("Week2", 0.2f),
+                        Pair("Week3", 0.3f),
+                        Pair("Week4", 0.4f),
+                        ), barwidth = 50.dp, graphWidth = 530.dp, max_value = 1
+                )
+
+                "Annual" -> Chart(
+
+                    data = mapOf(
+
+                        Pair("Jan", 0.1f),
+                        Pair("Feb", 0.2f),
+                        Pair("Mar", 0.3f),
+                        Pair("Apr", 0.4f),
+                        Pair("May", 0.5f),
+                        Pair("Jun", 0.6f),
+                        Pair("Jul", 0.7f),
+                        Pair("Aug", 0.7f),
+                        Pair("Sep", 0.7f),
+                        Pair("Oct", 0.7f),
+                        Pair("Nov", 0.7f),
+                        Pair("Dec", 0.7f),
+
+                        ), barwidth = 30.dp, graphWidth = 900.dp, max_value = 1
+                )
             }
+        }
 
         item {
             var habitscompleted = listOf("Habit1", "Habit2", "Habit3")
@@ -185,7 +184,6 @@ fun Summary() {
             }
 
         }
-
 
 
     }
