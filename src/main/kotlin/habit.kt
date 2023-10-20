@@ -61,40 +61,29 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToDoList() {
     val (selectedSection, setSelectedSection) = remember { mutableStateOf("Section 1") }
     Column(
-        modifier = Modifier.fillMaxHeight()
-            .padding(top = 24.dp)
+        modifier = Modifier.fillMaxHeight().padding(top = 24.dp)
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.1f)  // 10% of parent's height
+            modifier = Modifier.fillMaxWidth().weight(0.1f)  // 10% of parent's height
             // other modifiers, content, etc.
         ) {
             Row() {
-                val commonButtonModifier = Modifier
-                    .weight(1f)
-                    .padding(14.dp)
-                    .size(width = 150.dp, height = 1000.dp)
+                val commonButtonModifier = Modifier.weight(1f).padding(14.dp).size(width = 150.dp, height = 1000.dp)
                 OutlinedButton(
                     onClick = { setSelectedSection("Home") }, modifier = commonButtonModifier
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-//                            Icon(
-//                                painter = painterResource("home.svg"),
-//                                contentDescription = null
-//                            )
-
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Work")
                     }
+
                 }
                 OutlinedButton(
                     onClick = { setSelectedSection("Calendar") }, modifier = commonButtonModifier
@@ -119,30 +108,48 @@ fun ToDoList() {
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.9f)  // 90% of parent's height
+            modifier = Modifier.fillMaxWidth().weight(0.9f)  // 90% of parent's height
             // other modifiers, content, etc.
         ) {
-            Column() {
+            val workTodoList = listOf(
+                "Do recursive relation practice problem" to "Using exapmle from assignment 1",
+                "Review and respond to pending emails." to "Especially from the finance and HR departments.",
+                "Prepare for the 10 am team meeting." to "Collect data and graphs for presentation.",
+                "Update project timeline in the management tool." to "Ensure milestones for next month are clear.",
+                "Coordinate with the marketing team." to "Discuss the upcoming product launch.",
+            )
+            val checkedStates = remember { workTodoList.map { mutableStateOf(false) } }
 
-                for (i in 0 until 5) {
-                    val checkedState = remember { mutableStateOf(false) }
-                    ListItem(headlineContent = { Text("One line list item with 24x24 icon") },
-                        supportingContent = { Text("Secondary text") },
-                        trailingContent = { Text("Priority 3") },
-                        leadingContent = {
-                            Checkbox(
-                                checked = checkedState.value,
-                                onCheckedChange = { checkedState.value = it }
-                            )
-                        }
-                    )
-                    Divider()
+            LazyColumn() {
+                // Sample To do list
+                workTodoList.forEachIndexed { index, (primary, secondary) ->
+                    item {
+                        ListItem(
+                            headlineContent = { Text(primary) },
+                            supportingContent = { Text(secondary) },
+                            trailingContent = { Text("Priority 3") },
+                            leadingContent = {
+                                Checkbox(
+                                    checked = checkedStates[index].value,
+                                    onCheckedChange = { checkedStates[index].value = it }
+                                )
+                            }
+                        )
+                        Divider()
+                    }
                 }
-
             }
-
+            Box(
+                modifier = Modifier.fillMaxSize(), // This will make the Box take up the entire available space
+                contentAlignment = Alignment.BottomEnd // This will align its children to the bottom right corner
+            ) {
+                ExtendedFloatingActionButton(
+                    modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
+                    onClick = { /* do something */ }
+                ) {
+                    Text(text = "Create New")
+                }
+            }
         }
     }
 }

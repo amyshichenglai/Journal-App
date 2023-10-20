@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.9.0"
@@ -17,8 +18,18 @@ dependencies {
     implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.3")
 }
+
+
 compose.desktop {
     application {
         mainClass = "MainKt"
+        nativeDistributions {
+            macOS{
+                iconFile.set(File("top.svg"));
+                targetFormats(TargetFormat.Dmg);
+            }
+
+        }
+
     }
 }

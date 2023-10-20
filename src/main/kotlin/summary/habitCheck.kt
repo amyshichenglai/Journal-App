@@ -54,7 +54,7 @@ fun HabitCheck(habit: String) {
             false,
             false
         )
-        val radius = 30f
+        val radius = 60f
         circlePositions.forEachIndexed {index, position ->
             Text(
                 modifier = Modifier
