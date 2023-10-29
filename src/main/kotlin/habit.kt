@@ -59,11 +59,32 @@ import androidx.compose.ui.res.*
 //import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.SQLException
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.random.Random
 
+object TodoTable : Table() {
+    val id = integer("id")
+    val primaryTask = varchar("primaryTask", 255)
+    val secondaryTask = varchar("secondaryTask", 255)
+    val priority = integer("priority")
+    val completed = bool("completed")
+}
 
+data class TodoItem(
+    val id: Int,
+    val primaryTask: String,
+    val secondaryTask: String,
+    val priority: Int,
+    var completed: Boolean
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToDoList() {
+    Database.connect("jdbc:sqlite:chinook.db")
     val (selectedSection, setSelectedSection) = remember { mutableStateOf("Section 1") }
     Column(
         modifier = Modifier.fillMaxHeight().padding(top = 24.dp)
@@ -111,28 +132,41 @@ fun ToDoList() {
             modifier = Modifier.fillMaxWidth().weight(0.9f)  // 90% of parent's height
             // other modifiers, content, etc.
         ) {
-            val workTodoList = listOf(
-                "Do recursive relation practice problem" to "Using exapmle from assignment 1",
-                "Review and respond to pending emails." to "Especially from the finance and HR departments.",
-                "Prepare for the 10 am team meeting." to "Collect data and graphs for presentation.",
-                "Update project timeline in the management tool." to "Ensure milestones for next month are clear.",
-                "Coordinate with the marketing team." to "Discuss the upcoming product launch.",
-            )
-            val checkedStates = remember { workTodoList.map { mutableStateOf(false) } }
-
+            val triggerRecomposition = remember { mutableStateOf(false) }
             LazyColumn() {
-                // Sample To do list
-                workTodoList.forEachIndexed { index, (primary, secondary) ->
+                val todoListFromDb: MutableList<TodoItem> = mutableListOf()
+                transaction {
+                    TodoTable.selectAll().forEach {
+                        todoListFromDb.add(
+                            TodoItem(
+                                it[TodoTable.id],
+                                it[TodoTable.primaryTask],
+                                it[TodoTable.secondaryTask],
+                                it[TodoTable.priority],
+                                it[TodoTable.completed]
+                            )
+                        )
+                    }
+                }
+
+                todoListFromDb.forEachIndexed { index, todoItem ->
                     item {
                         ListItem(
-                            headlineContent = { Text(primary) },
-                            supportingContent = { Text(secondary) },
-                            trailingContent = { Text("Priority 3") },
+                            headlineContent = { Text(todoItem.primaryTask) },
+                            supportingContent = { Text(todoItem.secondaryTask) },
+                            trailingContent = { Text("Priority ${todoItem.priority}") },
                             leadingContent = {
-                                Checkbox(
-                                    checked = checkedStates[index].value,
-                                    onCheckedChange = { checkedStates[index].value = it }
-                                )
+                                Checkbox(checked = todoItem.completed,
+                                    onCheckedChange = { isChecked ->
+                                        // Update local state
+                                        todoItem.completed = isChecked
+                                        // Update database
+                                        transaction {
+                                            TodoTable.update({ TodoTable.id eq todoItem.id }) {
+                                                it[completed] = isChecked
+                                            }
+                                        }
+                                    })
                             }
                         )
                         Divider()
@@ -143,10 +177,8 @@ fun ToDoList() {
                 modifier = Modifier.fillMaxSize(), // This will make the Box take up the entire available space
                 contentAlignment = Alignment.BottomEnd // This will align its children to the bottom right corner
             ) {
-                ExtendedFloatingActionButton(
-                    modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
-                    onClick = { /* do something */ }
-                ) {
+                ExtendedFloatingActionButton(modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
+                    onClick = { /* do something */ }) {
                     Text(text = "Create New")
                 }
             }
