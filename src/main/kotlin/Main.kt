@@ -60,7 +60,9 @@ import ui.theme.md_theme_light_background
 import note.*
 // Sample Composable functions for each section
 
-import note.*
+import note.*import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.SQLException
 
 @Composable
 fun BoxItem(color: Color, text: String) {
