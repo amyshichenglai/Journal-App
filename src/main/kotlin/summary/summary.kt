@@ -17,14 +17,50 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontFamily
+import kotlinx.coroutines.delay
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.text.DateFormatSymbols
 
-var Date1 = "10"
-var Date2 = "17"
-var currMonth = "October"
-var currYear = "2023"
+val currentDate = LocalDate.now()
+val currentDateTime = LocalDateTime.now()
+
+fun getMonthName(monthNumber: Int): String {
+    val symbols = DateFormatSymbols()
+    val monthNames = symbols.months
+    return monthNames[monthNumber]
+}
+
+fun formatTimeAs24HourClock(dateTime: LocalDateTime): String {
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    return dateTime.format(timeFormatter)
+}
+
 
 @Composable
 fun Summary() {
+    var currentDate by remember { mutableStateOf(LocalDate.now()) }
+    var Date1 by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("dd"))) }
+    var Date2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))) }
+    var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
+    var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
+    var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
+    var currMonth2 by remember { mutableStateOf(getMonthName(monthNumber2)) }
+    var currYear by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("yyyy"))) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentDate = LocalDate.now()
+            Date1 = currentDate.format(DateTimeFormatter.ofPattern("dd"))
+            Date2 = currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))
+            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
+            currMonth = getMonthName(monthNumber)
+            currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
+            delay(1000) // Update every second or as needed
+        }
+    }
+
     var progress by remember { mutableStateOf(0.1f) }
     var selectedSection by remember { mutableStateOf("Weekly") }
     var habit by remember { mutableStateOf("All") }
@@ -49,7 +85,7 @@ fun Summary() {
             ) {
                 when (selectedSection) {
                     "Weekly" -> Text(
-                        text = "Week of " + currMonth + " " + Date1 + " - " + currMonth + " " + Date2,
+                        text = "Week of " + currMonth + " " + Date1 + " - " + currMonth2 + " " + Date2,
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
