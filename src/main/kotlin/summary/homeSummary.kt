@@ -26,6 +26,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import androidx.compose.foundation.Image
 import androidx.compose.ui.input.key.Key.Companion.R
+import androidx.compose.ui.res.painterResource
+
 
 //barchart
 //https://github.com/developerchunk/BarGraph-JetpackCompose/tree/main/app/src/main/java/com/example/customchar
@@ -137,7 +139,6 @@ fun HomeSummary() {
             .fillMaxWidth()
     ) {
         val backgroundPainter = painterResource("welcome_background.jpeg")
-
         Box(
             modifier = Modifier
                 .padding(8.dp)
