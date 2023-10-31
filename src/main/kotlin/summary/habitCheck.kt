@@ -22,8 +22,6 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.awt.Color.red
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 @Composable
@@ -39,10 +37,7 @@ fun HabitCheck(habit: String) {
                     it[TodoTable.primaryTask],
                     it[TodoTable.secondaryTask],
                     it[TodoTable.priority],
-                    it[TodoTable.completed],
-                    it[TodoTable.section],
-                    it[TodoTable.datetime],
-                    it[TodoTable.duration]
+                    it[TodoTable.completed]
                 )
             )
         }
@@ -85,43 +80,7 @@ fun HabitCheck(habit: String) {
             "Sat",
             "Sun"
         )
-        val allcomplete = mutableListOf(
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        )
-        val workcomplete = mutableListOf(
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        )
-        val studycomplete = mutableListOf(
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        )
-        val hobbycomplete = mutableListOf(
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        )
-        val lifecomplete = mutableListOf(
+        val complete = listOf(
             false,
             false,
             false,
@@ -131,41 +90,18 @@ fun HabitCheck(habit: String) {
             false
         )
 
-        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-//        println(LocalDate.parse(workTodo[0].datetime, formatter).dayOfWeek.toString())
-//        println(workTodo[0].completed)
-//        println(LocalDate.parse(workTodo[1].datetime, formatter).dayOfWeek.toString())
-//        println(workTodo[1].completed)
-//        println(LocalDate.parse(workTodo[2].datetime, formatter).dayOfWeek.toString())
-//        println(workTodo[2].completed)
-//        println(LocalDate.parse(workTodo[3].datetime, formatter).dayOfWeek.toString())
-//        println(workTodo[3].completed)
-        listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY").forEachIndexed {index, day ->
-            allcomplete[index] = (todoListFromDb.count{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day}) == (todoListFromDb.count{it.completed == true && LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day})
-            workcomplete[index] = (workTodo.count{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day}) == (workCompleted.count{LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day})
-            studycomplete[index] = (studyTodo.count{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day}) == (studyCompleted.count{LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day})
-            hobbycomplete[index] = (hobbyTodo.count{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day}) == (hobbyCompleted.count{LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day})
-            lifecomplete[index] = (lifeTodo.count{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day}) == (lifeCompleted.count{LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == day})
+        listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").forEachIndexed {index, _ ->
+            complete[index] = (workTodo.count{it.datetime.dayOfWeek.toString() == "Monday"}) == (workCompleted.count{it.datetime.dayOfWeek.toString() == "Monday"})
     }
 
         val radius = 60f
         circlePositions.forEachIndexed {index, position ->
-            var habitCompleted: MutableList<Boolean> = allcomplete
-            if (habit == "Work") {
-                habitCompleted = workcomplete
-            } else if (habit == "Study") {
-                habitCompleted = studycomplete
-            } else if (habit == "Hobby") {
-                habitCompleted = hobbycomplete
-            } else if (habit == "Life") {
-                habitCompleted = lifecomplete
-            }
             Text(
                 modifier = Modifier
                     .padding(16.dp)
                     .offset(position.x.dp, y=position.y.dp)
                     .drawBehind {
-                        if (habitCompleted[index]) {
+                        if (complete[index]) {
                             drawCircle(
                                 color = Color(0xFF476810), //primary
                                 radius = radius
@@ -179,7 +115,7 @@ fun HabitCheck(habit: String) {
                     },
                 text = Weekday[index],
                 color =
-                    if (habitCompleted[index]) {
+                    if (complete[index]) {
                         Color(0xFFFFFFFF)//onPrimary
                     } else {
                         Color.Black
