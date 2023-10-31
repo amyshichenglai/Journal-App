@@ -27,7 +27,7 @@ fun homeCalendar() {
             modifier = Modifier
                 .size(250.dp, 400.dp) // Adjust these values as per your desired size
                 .verticalScroll(rememberScrollState())
-                .background(MaterialTheme.colorScheme.errorContainer), // Optional: If you want a background color
+                .background(Color(0xFFede6fa)), // Optional: If you want a background color
             contentAlignment = Alignment.TopEnd
         ) {
             DailyCalendar(date = 14, month = 10, year = 2023)
