@@ -18,14 +18,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.math.round
 import kotlin.random.Random
 
-
 data class TodoItem(
-    val id: Int,
-    val primaryTask: String,
-    val secondaryTask: String,
-    val priority: Int,
-    var completed: Boolean
+    val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
+    var completed: Boolean, val section: String, val datetime: String, val duration: Int
 )
+
 @Composable
 fun TaskProgress(
     progress: Float,
@@ -44,7 +41,10 @@ fun TaskProgress(
                     it[TodoTable.primaryTask],
                     it[TodoTable.secondaryTask],
                     it[TodoTable.priority],
-                    it[TodoTable.completed]
+                    it[TodoTable.completed],
+                    it[TodoTable.section],
+                    it[TodoTable.datetime],
+                    it[TodoTable.duration]
                 )
             )
         }
