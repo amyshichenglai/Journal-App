@@ -1,5 +1,6 @@
 package summary
 
+import TodoTable
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -22,7 +23,6 @@ data class TodoItem(
     val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
     var completed: Boolean, val section: String, val datetime: String, val duration: Int
 )
-
 @Composable
 fun TaskProgress(
     progress: Float,

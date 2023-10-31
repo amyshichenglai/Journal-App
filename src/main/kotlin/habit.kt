@@ -84,10 +84,12 @@ import kotlin.random.Random
 import java.util.Date
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.Table
-
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 object TodoTable : Table() {
-    val id = integer("id")
+    val id = integer("id").autoIncrement()
     val primaryTask = varchar("primaryTask", 255)
     val secondaryTask = varchar("secondaryTask", 255)
     val priority = integer("priority")
@@ -95,13 +97,13 @@ object TodoTable : Table() {
     val datetime = varchar("datetime", 255)
     val section = varchar("section", 255)
     val duration = integer("duration")
+    override val primaryKey = PrimaryKey(id, name = "PK_User_ID")
 }
 
 data class TodoItem(
     val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
-    var completed: Boolean, val section: String
+    var completed: Boolean, val section: String, val date_time: String
 )
-
 
 @Composable
 fun CreateTodoDialog(onCreate: (TodoItem) -> Unit) {
@@ -109,11 +111,9 @@ fun CreateTodoDialog(onCreate: (TodoItem) -> Unit) {
     var secondaryTask by remember { mutableStateOf("") }
     var priority by remember { mutableStateOf(1) }
     var section by remember { mutableStateOf("") }
-
-
-    
-
-
+    var dueDate by remember { mutableStateOf("") }
+    var isDateValid by remember { mutableStateOf(true) }
+    var areFieldsValid by remember { mutableStateOf(true) }
 
     AlertDialog(
         onDismissRequest = { /* dismiss dialog */ },
@@ -143,25 +143,55 @@ fun CreateTodoDialog(onCreate: (TodoItem) -> Unit) {
                     onValueChange = { section = it },
                     label = { Text("Section") }
                 )
+                TextField(
+                    value = dueDate,
+                    onValueChange = { dueDate = it },
+                    label = { Text("Due Date (yyyy-MM-dd)") }
+                )
+                // Error messages appear here, inside the AlertDialog
+                if (!isDateValid) {
+                    Text("Invalid date format", color = Color.Red)
+                }
+                if (!areFieldsValid) {
+                    Text("All fields are required", color = Color.Red)
+                }
             }
         },
         confirmButton = {
-            Button(onClick = {
-                onCreate(
-                    TodoItem(
-                        id = 0,  // Assuming your DB auto-increments IDs
-                        primaryTask = primaryTask,
-                        secondaryTask = secondaryTask,
-                        priority = priority,
-                        completed = false,
-                        section = section
-                    )
-                )
-            }) {
+            Button(
+                onClick = {
+                    isDateValid = validateDate(dueDate)
+                    areFieldsValid = primaryTask.isNotEmpty() && secondaryTask.isNotEmpty() && section.isNotEmpty() && isDateValid
+
+                    if (areFieldsValid) {
+                        onCreate(
+                            TodoItem(
+                                id = 0, // Assuming your DB auto-increments IDs
+                                primaryTask = primaryTask,
+                                secondaryTask = secondaryTask,
+                                priority = priority,
+                                completed = false,
+                                section = section,
+                                date_time = dueDate
+                            )
+                        )
+                    }
+                }
+            ) {
                 Text("Create")
             }
         }
     )
+}
+// Validates the given date string using a specific format
+private fun validateDate(dateStr: String): Boolean {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+        LocalDate.parse(dateStr, formatter)
+        true
+    } catch (e: DateTimeParseException) {
+        false
+    }
 }
 
 
@@ -172,9 +202,96 @@ fun ToDoList() {
     Database.connect("jdbc:sqlite:chinook.db")
     val (selectedSection, setSelectedSection) = remember { mutableStateOf("Work") }
     val todoListFromDb = remember { mutableStateListOf<TodoItem>()}
-
-
-
+//        transaction {
+//            SchemaUtils.createMissingTablesAndColumns(TodoTable) // Create table if not exists
+//
+//            // Delete all existing records (Optional, if you want to start fresh)
+//            TodoTable.deleteAll()
+//
+//            // Work section
+//            TodoTable.insert {
+//                it[primaryTask] = "Write report"
+//                it[secondaryTask] = "Due next week"
+//                it[priority] = 1
+//                it[completed] = false
+//                it[section] = "Work"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Email client"
+//                it[secondaryTask] = "Urgent"
+//                it[priority] = 2
+//                it[completed] = false
+//                it[section] = "Work"
+//                it[duration] = 3
+//                it[datetime] = "20231029"
+//            }
+//
+//            // Study section
+//            TodoTable.insert {
+//                it[primaryTask] = "Study for exam"
+//                it[secondaryTask] = "Chapter 1-5"
+//                it[priority] = 1
+//                it[completed] = false
+//                it[section] = "Study"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Complete assignment"
+//                it[secondaryTask] = "Submit online"
+//                it[priority] = 2
+//                it[completed] = false
+//                it[section] = "Study"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            // Hobby section
+//            TodoTable.insert {
+//                it[primaryTask] = "Learn guitar"
+//                it[secondaryTask] = "Practice chords"
+//                it[priority] = 3
+//                it[completed] = false
+//                it[section] = "Hobby"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Go fishing"
+//                it[secondaryTask] = "This weekend"
+//                it[priority] = 4
+//                it[completed] = false
+//                it[section] = "Hobby"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            // Life section
+//            TodoTable.insert {
+//                it[primaryTask] = "Buy groceries"
+//                it[secondaryTask] = "Fruits, Vegetables"
+//                it[priority] = 3
+//                it[completed] = false
+//                it[section] = "Life"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Call mom"
+//                it[secondaryTask] = "Weekend catchup"
+//                it[priority] = 4
+//                it[completed] = false
+//                it[section] = "Life"
+//                it[duration] = 1
+//                it[datetime] = "20231028"
+//            }
+//        }
     // Moved database fetching to LaunchedEffect to minimize recomposition
     LaunchedEffect(selectedSection) {
         transaction {
@@ -187,7 +304,8 @@ fun ToDoList() {
                         it[TodoTable.secondaryTask],
                         it[TodoTable.priority],
                         it[TodoTable.completed],
-                        it[TodoTable.section]  // New property
+                        it[TodoTable.section],
+                        it[TodoTable.datetime]
                     )
                 )
             }
@@ -281,10 +399,10 @@ fun ToDoList() {
                             it[priority] = newItem.priority
                             it[completed] = newItem.completed
                             it[section] = newItem.section
-                            it[id] = 20
-                            it[datetime] = "20201010"
+                            it[datetime] = newItem.date_time
                             it[duration] = 2
                         }
+                        print(newItem.date_time)
                         // Add new item to the list
                         todoListFromDb.add(newItem.copy(id = 20))
                     }
