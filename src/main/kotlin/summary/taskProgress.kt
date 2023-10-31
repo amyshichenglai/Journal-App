@@ -1,5 +1,6 @@
 package summary
 
+import TodoTable
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -20,12 +21,10 @@ import kotlin.random.Random
 
 
 data class TodoItem(
-    val id: Int,
-    val primaryTask: String,
-    val secondaryTask: String,
-    val priority: Int,
-    var completed: Boolean
+    val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
+    var completed: Boolean, val section: String, val date_time: String
 )
+
 @Composable
 fun TaskProgress(
     progress: Float,
@@ -44,7 +43,9 @@ fun TaskProgress(
                     it[TodoTable.primaryTask],
                     it[TodoTable.secondaryTask],
                     it[TodoTable.priority],
-                    it[TodoTable.completed]
+                    it[TodoTable.completed],
+                    it[TodoTable.section],
+                    it[TodoTable.datetime]
                 )
             )
         }
