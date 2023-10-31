@@ -13,10 +13,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.exposed.sql.Database
 
 @Composable
 fun HabitSelection(selectedSection: String, onSelectedSectionChanged: (String) -> Unit) {
-    val items = listOf("All", "Habit 1", "Habit 2", "Habit 3", "Habit 4")
+    val items = listOf("All", "Work", "Study", "Hobby", "Life")
     var expanded by remember { mutableStateOf(false) }
 
     Box {

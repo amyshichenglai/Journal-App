@@ -18,11 +18,46 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Shape
 //import androidx.compose.material3.md.sys.shape.corner.full.Circular
 import androidx.compose.ui.draw.drawBehind
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.awt.Color.red
 
 
 @Composable
 fun HabitCheck(habit: String) {
+    Database.connect("jdbc:sqlite:chinook.db")
+    val todoListFromDb: MutableList<TodoItem> = mutableListOf()
+
+    transaction {
+        TodoTable.selectAll().forEach {
+            todoListFromDb.add(
+                TodoItem(
+                    it[TodoTable.id],
+                    it[TodoTable.primaryTask],
+                    it[TodoTable.secondaryTask],
+                    it[TodoTable.priority],
+                    it[TodoTable.completed]
+                )
+            )
+        }
+    }
+
+    var workTodo = todoListFromDb.filter { todoItem -> todoItem.section == "Work" }
+    var studyTodo = todoListFromDb.filter { todoItem -> todoItem.section == "Study" }
+    var hobbyTodo = todoListFromDb.filter { todoItem -> todoItem.section == "Hobby" }
+    var lifeTodo = todoListFromDb.filter { todoItem -> todoItem.section == "Life" }
+
+    var workCompleted = todoListFromDb.filter { todoItem -> todoItem.section == "Work" && todoItem.completed == true }
+    var studyCompleted = todoListFromDb.filter { todoItem -> todoItem.section == "Study" && todoItem.completed == true}
+    var hobbyCompleted = todoListFromDb.filter { todoItem -> todoItem.section == "Hobby" && todoItem.completed == true}
+    var lifeCompleted = todoListFromDb.filter { todoItem -> todoItem.section == "Life" && todoItem.completed == true}
+
+//    var workProgress = (todoListFromDb.count{it.section == "Work" && it.completed == true}.toDouble() / todoListFromDb.count{it.section == "Work"}.toDouble()).toFloat()
+//    var studyProgress = (todoListFromDb.count{it.section == "Study" && it.completed == true}.toDouble() / todoListFromDb.count{it.section == "Study"}.toDouble()).toFloat()
+//    var hobbyProgress = (todoListFromDb.count{it.section == "Hobby" && it.completed == true}.toDouble() / todoListFromDb.count{it.section == "Hobby"}.toDouble()).toFloat()
+//    var lifeProgress = (todoListFromDb.count{it.section == "Life" && it.completed == true}.toDouble() / todoListFromDb.count{it.section == "Life"}.toDouble()).toFloat()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -46,14 +81,19 @@ fun HabitCheck(habit: String) {
             "Sun"
         )
         val complete = listOf(
-            true,
-            true,
-            true,
-            true,
+            false,
+            false,
+            false,
+            false,
             false,
             false,
             false
         )
+
+        listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").forEachIndexed {index, _ ->
+            complete[index] = (workTodo.count{it.datetime.dayOfWeek.toString() == "Monday"}) == (workCompleted.count{it.datetime.dayOfWeek.toString() == "Monday"})
+    }
+
         val radius = 60f
         circlePositions.forEachIndexed {index, position ->
             Text(
