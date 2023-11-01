@@ -17,14 +17,50 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontFamily
+import kotlinx.coroutines.delay
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.text.DateFormatSymbols
 
-var Date1 = "10"
-var Date2 = "17"
-var currMonth = "October"
-var currYear = "2023"
+val currentDate = LocalDate.now()
+val currentDateTime = LocalDateTime.now()
+
+fun getMonthName(monthNumber: Int): String {
+    val symbols = DateFormatSymbols()
+    val monthNames = symbols.months
+    return monthNames[monthNumber]
+}
+
+fun formatTimeAs24HourClock(dateTime: LocalDateTime): String {
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    return dateTime.format(timeFormatter)
+}
+
 
 @Composable
 fun Summary() {
+    var currentDate by remember { mutableStateOf(LocalDate.now()) }
+    var Date1 by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("dd"))) }
+    var Date2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))) }
+    var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
+    var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
+    var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
+    var currMonth2 by remember { mutableStateOf(getMonthName(monthNumber2)) }
+    var currYear by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("yyyy"))) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentDate = LocalDate.now()
+            Date1 = currentDate.format(DateTimeFormatter.ofPattern("dd"))
+            Date2 = currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))
+            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
+            currMonth = getMonthName(monthNumber)
+            currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
+            delay(1000) // Update every second or as needed
+        }
+    }
+
     var progress by remember { mutableStateOf(0.1f) }
     var selectedSection by remember { mutableStateOf("Weekly") }
     var habit by remember { mutableStateOf("All") }
@@ -49,7 +85,7 @@ fun Summary() {
             ) {
                 when (selectedSection) {
                     "Weekly" -> Text(
-                        text = "Week of " + currMonth + " " + Date1 + " - " + currMonth + " " + Date2,
+                        text = "Week of " + currMonth + " " + Date1 + " - " + currMonth2 + " " + Date2,
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
@@ -85,13 +121,13 @@ fun Summary() {
         }
 
         item {
-                when (selectedSection) {
-                    "Weekly" -> LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                    ) {
-                        item{
-                            Chart(
+            when (selectedSection) {
+                "Weekly" -> LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    item {
+                        Chart(
 
                             data = mapOf(
 
@@ -105,54 +141,53 @@ fun Summary() {
 
 
                                 ), barwidth = 30.dp, graphWidth = 530.dp, max_value = 1
-                        )}
-                        item {
-                            Column {
-                                HabitSelection(habit) { newSection ->
-                                    habit = newSection
-                                }
-                                HabitCheck(habit)
+                        )
+                    }
+                    item {
+                        Column {
+                            HabitSelection(habit) { newSection ->
+                                habit = newSection
                             }
-
+                            HabitCheck(habit)
                         }
-
 
                     }
 
 
-                    "Monthly" -> Chart(
-
-                        data = mapOf(
-
-                            Pair("Week1", 0.1f),
-                            Pair("Week2", 0.2f),
-                            Pair("Week3", 0.3f),
-                            Pair("Week4", 0.4f),
-
-                            ), barwidth = 50.dp, graphWidth = 530.dp, max_value = 1
-                    )
-
-                    "Annual" -> Chart(
-
-                        data = mapOf(
-
-                            Pair("Jan", 0.1f),
-                            Pair("Feb", 0.2f),
-                            Pair("Mar", 0.3f),
-                            Pair("Apr", 0.4f),
-                            Pair("May", 0.5f),
-                            Pair("Jun", 0.6f),
-                            Pair("Jul", 0.7f),
-                            Pair("Aug", 0.7f),
-                            Pair("Sep", 0.7f),
-                            Pair("Oct", 0.7f),
-                            Pair("Nov", 0.7f),
-                            Pair("Dec", 0.7f),
-
-                            ), barwidth = 30.dp, graphWidth = 900.dp,max_value = 1
-                    )
                 }
+
+
+                "Monthly" -> Chart(
+
+                    data = mapOf(
+                        Pair("Week1", 0.1f),
+                        Pair("Week2", 0.2f),
+                        Pair("Week3", 0.3f),
+                        Pair("Week4", 0.4f),
+                        ), barwidth = 50.dp, graphWidth = 530.dp, max_value = 1
+                )
+
+                "Annual" -> Chart(
+
+                    data = mapOf(
+
+                        Pair("Jan", 0.1f),
+                        Pair("Feb", 0.2f),
+                        Pair("Mar", 0.3f),
+                        Pair("Apr", 0.4f),
+                        Pair("May", 0.5f),
+                        Pair("Jun", 0.6f),
+                        Pair("Jul", 0.7f),
+                        Pair("Aug", 0.7f),
+                        Pair("Sep", 0.7f),
+                        Pair("Oct", 0.7f),
+                        Pair("Nov", 0.7f),
+                        Pair("Dec", 0.7f),
+
+                        ), barwidth = 30.dp, graphWidth = 900.dp, max_value = 1
+                )
             }
+        }
 
         item {
             var habitscompleted = listOf("Habit1", "Habit2", "Habit3")
@@ -185,7 +220,6 @@ fun Summary() {
             }
 
         }
-
 
 
     }

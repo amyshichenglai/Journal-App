@@ -15,20 +15,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import summary.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -47,10 +40,33 @@ import java.io.IOException
 import androidx.compose.ui.window.*
 import java.awt.Dimension
 import androidx.compose.ui.window.Window
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.text.input.ImeAction
+import org.jetbrains.exposed.sql.transactions.transaction
 import androidx.compose.ui.window.application
 import androidx.compose.material3.*
 import androidx.compose.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.vector.*
@@ -59,90 +75,339 @@ import androidx.compose.ui.res.*
 //import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.SQLException
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.random.Random
+import java.util.Date
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.Table
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+
+object TodoTable : Table() {
+    val id = integer("id").autoIncrement()
+    val primaryTask = varchar("primaryTask", 255)
+    val secondaryTask = varchar("secondaryTask", 255)
+    val priority = integer("priority")
+    val completed = bool("completed")
+    val datetime = varchar("datetime", 255)
+    val section = varchar("section", 255)
+    val duration = integer("duration")
+    override val primaryKey = PrimaryKey(id, name = "PK_User_ID")
+}
+
+data class TodoItem(
+    val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
+    var completed: Boolean, val section: String, val date_time: String
+)
+
+@Composable
+fun CreateTodoDialog(onCreate: (TodoItem) -> Unit) {
+    var primaryTask by remember { mutableStateOf("") }
+    var secondaryTask by remember { mutableStateOf("") }
+    var priority by remember { mutableStateOf(1) }
+    var section by remember { mutableStateOf("") }
+    var dueDate by remember { mutableStateOf("") }
+    var isDateValid by remember { mutableStateOf(true) }
+    var areFieldsValid by remember { mutableStateOf(true) }
+
+    AlertDialog(
+        onDismissRequest = { /* dismiss dialog */ },
+        title = {
+            Text(text = "Create New Todo Item")
+        },
+        text = {
+            Column {
+                TextField(
+                    value = primaryTask,
+                    onValueChange = { primaryTask = it },
+                    label = { Text("Primary Task") }
+                )
+                TextField(
+                    value = secondaryTask,
+                    onValueChange = { secondaryTask = it },
+                    label = { Text("Secondary Task") }
+                )
+                TextField(
+                    value = priority.toString(),
+                    onValueChange = { priority = it.toIntOrNull() ?: 1 },
+                    label = { Text("Priority") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+                TextField(
+                    value = section,
+                    onValueChange = { section = it },
+                    label = { Text("Section") }
+                )
+                TextField(
+                    value = dueDate,
+                    onValueChange = { dueDate = it },
+                    label = { Text("Due Date (yyyy-MM-dd)") }
+                )
+                // Error messages appear here, inside the AlertDialog
+                if (!isDateValid) {
+                    Text("Invalid date format", color = Color.Red)
+                }
+                if (!areFieldsValid) {
+                    Text("All fields are required", color = Color.Red)
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    isDateValid = validateDate(dueDate)
+                    areFieldsValid = primaryTask.isNotEmpty() && secondaryTask.isNotEmpty() && section.isNotEmpty() && isDateValid
+
+                    if (areFieldsValid) {
+                        onCreate(
+                            TodoItem(
+                                id = 0, // Assuming your DB auto-increments IDs
+                                primaryTask = primaryTask,
+                                secondaryTask = secondaryTask,
+                                priority = priority,
+                                completed = false,
+                                section = section,
+                                date_time = dueDate
+                            )
+                        )
+                    }
+                }
+            ) {
+                Text("Create")
+            }
+        }
+    )
+}
+// Validates the given date string using a specific format
+private fun validateDate(dateStr: String): Boolean {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+        LocalDate.parse(dateStr, formatter)
+        true
+    } catch (e: DateTimeParseException) {
+        false
+    }
+}
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToDoList() {
-    val (selectedSection, setSelectedSection) = remember { mutableStateOf("Section 1") }
+    Database.connect("jdbc:sqlite:chinook.db")
+    val (selectedSection, setSelectedSection) = remember { mutableStateOf("Work") }
+    val todoListFromDb = remember { mutableStateListOf<TodoItem>()}
+//        transaction {
+//            SchemaUtils.createMissingTablesAndColumns(TodoTable) // Create table if not exists
+//
+//            // Delete all existing records (Optional, if you want to start fresh)
+//            TodoTable.deleteAll()
+//
+//            // Work section
+//            TodoTable.insert {
+//                it[primaryTask] = "Write report"
+//                it[secondaryTask] = "Due next week"
+//                it[priority] = 1
+//                it[completed] = false
+//                it[section] = "Work"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Email client"
+//                it[secondaryTask] = "Urgent"
+//                it[priority] = 2
+//                it[completed] = false
+//                it[section] = "Work"
+//                it[duration] = 3
+//                it[datetime] = "20231029"
+//            }
+//
+//            // Study section
+//            TodoTable.insert {
+//                it[primaryTask] = "Study for exam"
+//                it[secondaryTask] = "Chapter 1-5"
+//                it[priority] = 1
+//                it[completed] = false
+//                it[section] = "Study"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Complete assignment"
+//                it[secondaryTask] = "Submit online"
+//                it[priority] = 2
+//                it[completed] = false
+//                it[section] = "Study"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            // Hobby section
+//            TodoTable.insert {
+//                it[primaryTask] = "Learn guitar"
+//                it[secondaryTask] = "Practice chords"
+//                it[priority] = 3
+//                it[completed] = false
+//                it[section] = "Hobby"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Go fishing"
+//                it[secondaryTask] = "This weekend"
+//                it[priority] = 4
+//                it[completed] = false
+//                it[section] = "Hobby"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            // Life section
+//            TodoTable.insert {
+//                it[primaryTask] = "Buy groceries"
+//                it[secondaryTask] = "Fruits, Vegetables"
+//                it[priority] = 3
+//                it[completed] = false
+//                it[section] = "Life"
+//                it[duration] = 3
+//                it[datetime] = "20231030"
+//            }
+//
+//            TodoTable.insert {
+//                it[primaryTask] = "Call mom"
+//                it[secondaryTask] = "Weekend catchup"
+//                it[priority] = 4
+//                it[completed] = false
+//                it[section] = "Life"
+//                it[duration] = 1
+//                it[datetime] = "20231028"
+//            }
+//        }
+    // Moved database fetching to LaunchedEffect to minimize recomposition
+    LaunchedEffect(selectedSection) {
+        transaction {
+            todoListFromDb.clear()
+            TodoTable.select { TodoTable.section eq selectedSection }.forEach {
+                todoListFromDb.add(
+                    TodoItem(
+                        it[TodoTable.id],
+                        it[TodoTable.primaryTask],
+                        it[TodoTable.secondaryTask],
+                        it[TodoTable.priority],
+                        it[TodoTable.completed],
+                        it[TodoTable.section],
+                        it[TodoTable.datetime]
+                    )
+                )
+            }
+        }
+    }
+    // New state variable to control dialog visibility
+    var isDialogOpen by remember { mutableStateOf(false) }
     Column(
-        modifier = Modifier.fillMaxHeight()
-            .padding(top = 24.dp)
+        modifier = Modifier.fillMaxHeight().padding(top = 24.dp)
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.1f)  // 10% of parent's height
+            modifier = Modifier.fillMaxWidth().weight(0.1f)  // 10% of parent's height
             // other modifiers, content, etc.
         ) {
             Row() {
-                val commonButtonModifier = Modifier
-                    .weight(1f)
-                    .padding(14.dp)
-                    .size(width = 150.dp, height = 1000.dp)
+                val commonButtonModifier = Modifier.weight(1f).padding(14.dp).size(width = 150.dp, height = 1000.dp)
                 OutlinedButton(
-                    onClick = { setSelectedSection("Home") }, modifier = commonButtonModifier
+                    onClick = { setSelectedSection("Work") }, modifier = commonButtonModifier
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-//                            Icon(
-//                                painter = painterResource("home.svg"),
-//                                contentDescription = null
-//                            )
-
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Work")
                     }
+
                 }
                 OutlinedButton(
-                    onClick = { setSelectedSection("Calendar") }, modifier = commonButtonModifier
+                    onClick = { setSelectedSection("Study") }, modifier = commonButtonModifier
                 ) {
                     Text(
                         text = "Study"
                     )
                 }
                 OutlinedButton(
-                    onClick = { setSelectedSection("Summary") }, modifier = commonButtonModifier
+                    onClick = { setSelectedSection("Hobby") }, modifier = commonButtonModifier
                 ) {
                     Text("Hobby")
                 }
                 OutlinedButton(
-                    onClick = { setSelectedSection("To-Do-List") }, modifier = commonButtonModifier
+                    onClick = { setSelectedSection("Life") }, modifier = commonButtonModifier
                 ) {
                     Text("Life")
                 }
-
-
             }
         }
-
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.9f)  // 90% of parent's height
+            modifier = Modifier.fillMaxWidth().weight(0.9f)  // 90% of parent's height
             // other modifiers, content, etc.
         ) {
-            Column() {
+            val triggerRecomposition = remember { mutableStateOf(false) }
+            LazyColumn() {
+                todoListFromDb.forEachIndexed { index, todoItem ->
+                    item {
+                        ListItem(headlineContent = { Text(todoItem.primaryTask) },
+                            supportingContent = { Text(todoItem.secondaryTask) },
+                            trailingContent = { Text("Priority ${todoItem.priority}") },
+                            leadingContent = {
+                                Checkbox(checked = todoItem.completed, onCheckedChange = { isChecked ->
+                                    todoListFromDb[index] = todoListFromDb[index].copy(completed = isChecked)
 
-                for (i in 0 until 5) {
-                    val checkedState = remember { mutableStateOf(false) }
-                    ListItem(headlineContent = { Text("One line list item with 24x24 icon") },
-                        supportingContent = { Text("Secondary text") },
-                        trailingContent = { Text("Priority 3") },
-                        leadingContent = {
-                            Checkbox(
-                                checked = checkedState.value,
-                                onCheckedChange = { checkedState.value = it }
-                            )
-                        }
-                    )
-                    Divider()
+                                    // Update database
+                                    transaction {
+                                        TodoTable.update({ TodoTable.id eq todoItem.id }) {
+                                            it[completed] = isChecked
+                                        }
+                                    }
+                                })
+                            })
+                        Divider()
+                    }
                 }
-
             }
-
+            Box(
+                modifier = Modifier.fillMaxSize(), // This will make the Box take up the entire available space
+                contentAlignment = Alignment.BottomEnd // This will align its children to the bottom right corner
+            ) {
+                ExtendedFloatingActionButton(modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
+                    onClick = { isDialogOpen = true }) {
+                    Text(text = "Create New")
+                }
+            }
+            if (isDialogOpen) {
+                CreateTodoDialog(onCreate = { newItem ->
+                    isDialogOpen = false  // Close the dialog
+                    transaction {
+                        // Insert new item into the database
+                        val newId = TodoTable.insert {
+                            it[primaryTask] = newItem.primaryTask
+                            it[secondaryTask] = newItem.secondaryTask
+                            it[priority] = newItem.priority
+                            it[completed] = newItem.completed
+                            it[section] = newItem.section
+                            it[datetime] = newItem.date_time
+                            it[duration] = 2
+                        }
+                        print(newItem.date_time)
+                        // Add new item to the list
+                        todoListFromDb.add(newItem.copy(id = 20))
+                    }
+                })
+            }
         }
     }
 }

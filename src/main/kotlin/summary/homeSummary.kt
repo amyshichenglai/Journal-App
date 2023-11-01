@@ -1,10 +1,8 @@
 package summary
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,13 +18,20 @@ import androidx.compose.material3.*
 import androidx.compose.material.Button
 import androidx.compose.runtime.*
 import java.time.format.DateTimeFormatter
-import androidx.compose.foundation.background
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.border
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import kotlinx.coroutines.delay
 import java.time.LocalDate
+import java.time.LocalDateTime
+import androidx.compose.foundation.Image
+import androidx.compose.ui.input.key.Key.Companion.R
+import androidx.compose.ui.res.painterResource
+
 
 //barchart
 //https://github.com/developerchunk/BarGraph-JetpackCompose/tree/main/app/src/main/java/com/example/customchar
+
 
 @Composable
 fun DailyCalendar(date: Int, month: Int, year: Int) {
@@ -89,24 +94,65 @@ fun homeCalendar() {
 
 @Composable
 fun HomeSummary() {
+    var currentDate by remember { mutableStateOf(LocalDate.now()) }
+    var Date1 by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("dd"))) }
+    var Date2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))) }
+    var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
+    var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
+    var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
+    var currMonth2 by remember { mutableStateOf(getMonthName(monthNumber2)) }
+    var currYear by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("yyyy"))) }
+    var currentTimeFormatted by remember { mutableStateOf(formatTimeAs24HourClock(LocalDateTime.now())) }
+    var dayProgress by remember {mutableStateOf(0.0)}
+    var weekProgress by remember {mutableStateOf(0.0)}
+    var monthProgress by remember {mutableStateOf(0.0)}
+    var yearProgress by remember {mutableStateOf(0.0)}
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            currentDate = LocalDate.now()
+            Date1 = currentDate.format(DateTimeFormatter.ofPattern("dd"))
+            Date2 = currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))
+            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
+            currMonth = getMonthName(monthNumber)
+            currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
+            currentTimeFormatted = formatTimeAs24HourClock(LocalDateTime.now())
+            var currentTime = LocalDateTime.now()
+            var daysPassed = currentDate.dayOfWeek.value - 1
+            var hoursPassed = currentTime.hour
+            val daysPassedInMonth = currentDate.dayOfMonth
+            val totalDaysInMonth = currentDate.month.length(currentDate.isLeapYear)
+            val daysPassedInYear = currentDate.dayOfYear
+            val totalDaysInYear = if (currentDate.isLeapYear) 366 else 365
+            dayProgress = hoursPassed / 24.0
+            weekProgress = daysPassed / 7.0
+            monthProgress = daysPassedInMonth.toDouble() / totalDaysInMonth
+            yearProgress = daysPassedInYear.toDouble() / totalDaysInYear
+            delay(1000) // Update every second or as needed
+        }
+    }
 
     Row(
         modifier = Modifier
             .padding(8.dp)
             .clip(RoundedCornerShape(8.dp))
-//        .aspectRatio(3f)
             .fillMaxWidth()
     ) {
+        val backgroundPainter = painterResource("welcome_background.jpeg")
         Box(
             modifier = Modifier
                 .padding(8.dp)
                 .clip(RoundedCornerShape(8.dp))
-//                .aspectRatio(3f)
                 .fillMaxSize(0.65f)
                 .height(175.dp)
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-//            contentAlignment = Alignment.Center
         ) {
+            Image(
+                painter = backgroundPainter,
+                contentDescription = null, // Set a content description if needed
+                contentScale = ContentScale.Crop, // Adjust the content scale as needed
+                modifier = Modifier.fillMaxSize()
+            )
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.Center,
@@ -124,8 +170,9 @@ fun HomeSummary() {
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ButtonBox(date = "October 11, 2023")
-                    ButtonBox(time = "11:30PM")
+                    val date = currMonth + " " + Date1 + ", " + currYear
+                    ButtonBox(date = date)
+                    ButtonBox(time = currentTimeFormatted)
                 }
             }
         }
@@ -170,7 +217,7 @@ fun HomeSummary() {
                     LinearProgressIndicator(
                         backgroundColor = Color.LightGray,
                         color = MaterialTheme.colorScheme.primary,
-                        progress = progress,
+                        progress = dayProgress.toFloat(),
                         modifier = Modifier
                             .padding(10.dp)
                             .height(20.dp)
@@ -180,7 +227,7 @@ fun HomeSummary() {
                     LinearProgressIndicator(
                         backgroundColor = Color.LightGray,
                         color = MaterialTheme.colorScheme.primary,
-                        progress = progress,
+                        progress = weekProgress.toFloat(),
                         modifier = Modifier
                             .padding(10.dp)
                             .height(20.dp)
@@ -190,21 +237,21 @@ fun HomeSummary() {
                     LinearProgressIndicator(
                         backgroundColor = Color.LightGray,
                         color = MaterialTheme.colorScheme.primary,
-                        progress = progress,
+                        progress = monthProgress.toFloat(),
                         modifier = Modifier
                             .padding(10.dp)
                             .height(20.dp)
+                            .fillMaxWidth()
                     )
 
                     LinearProgressIndicator(
                         backgroundColor = Color.LightGray,
                         color = MaterialTheme.colorScheme.primary,
-                        progress = progress,
+                        progress = yearProgress.toFloat(),
                         modifier = Modifier
                             .padding(10.dp)
                             .height(20.dp)
                             .fillMaxWidth()
-
 
                     )
 

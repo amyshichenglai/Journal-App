@@ -10,17 +10,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun homeCalendar() {
-    Box(
+    Row(
         modifier = Modifier
-            .size(250.dp, 400.dp) // Adjust these values as per your desired size
-            .verticalScroll(rememberScrollState())
-            .background(MaterialTheme.colorScheme.errorContainer), // Optional: If you want a background color
-             contentAlignment = Alignment.TopEnd
+            .padding(16.dp)
+            .clip(RoundedCornerShape(8.dp))
+//        .aspectRatio(3f)
+            .fillMaxWidth()
     ) {
-        DailyCalendar(date = 14, month = 10, year = 2023)
+        Box(
+            modifier = Modifier
+                .size(250.dp, 400.dp) // Adjust these values as per your desired size
+                .verticalScroll(rememberScrollState())
+                .background(Color(0xFFede6fa)), // Optional: If you want a background color
+            contentAlignment = Alignment.TopEnd
+        ) {
+            DailyCalendar(date = 14, month = 10, year = 2023)
+        }
     }
+
 }
