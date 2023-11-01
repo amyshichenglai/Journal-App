@@ -18,6 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
 //barchart
 //https://github.com/developerchunk/BarGraph-JetpackCompose/tree/main/app/src/main/java/com/example/customchar
@@ -27,7 +30,7 @@ fun Chart(
     data: Map<String, Float>,
     barwidth: Dp,
     graphWidth: Dp,
-    max_value: Int
+    max_value: Float
 ) {
 
     // BarGraph Dimensions
@@ -59,52 +62,52 @@ fun Chart(
                 contentAlignment = Alignment.BottomCenter
             ) {
 
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Spacer(modifier = Modifier.fillMaxHeight())
-                }
-
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Text(text = String.format("%.2f", max_value.toFloat() / 5 * 4))
-                    Spacer(modifier = Modifier.fillMaxHeight(0.8f))
-                }
-
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Text(text = String.format("%.2f", max_value.toFloat() / 5 * 3))
-                    Spacer(modifier = Modifier.fillMaxHeight(0.6f))
-                }
-
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Text(text = String.format("%.2f", max_value.toFloat() / 5 * 2))
-                    Spacer(modifier = Modifier.fillMaxHeight(0.4f))
-                }
-
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Text(text = String.format("%.2f", max_value.toFloat() / 5))
-                    Spacer(modifier = Modifier.fillMaxHeight(0.2f))
-                }
-
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Text(text = String.format("%.2f", 0.0f))
-                    Spacer(modifier = Modifier.fillMaxHeight(0.0f))
-                }
+//                Column(
+//                    modifier = Modifier.fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Bottom
+//                ) {
+//                    Spacer(modifier = Modifier.fillMaxHeight())
+//                }
+//
+//                Column(
+//                    modifier = Modifier.fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Bottom
+//                ) {
+//                    Text(text = String.format("%.2f", max_value.toFloat() / 5 * 4))
+//                    Spacer(modifier = Modifier.fillMaxHeight(0.8f))
+//                }
+//
+//                Column(
+//                    modifier = Modifier.fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Bottom
+//                ) {
+//                    Text(text = String.format("%.2f", max_value.toFloat() / 5 * 3))
+//                    Spacer(modifier = Modifier.fillMaxHeight(0.6f))
+//                }
+//
+//                Column(
+//                    modifier = Modifier.fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Bottom
+//                ) {
+//                    Text(text = String.format("%.2f", max_value.toFloat() / 5 * 2))
+//                    Spacer(modifier = Modifier.fillMaxHeight(0.4f))
+//                }
+//
+//                Column(
+//                    modifier = Modifier.fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Bottom
+//                ) {
+//                    Text(text = String.format("%.2f", max_value.toFloat() / 5))
+//                    Spacer(modifier = Modifier.fillMaxHeight(0.2f))
+//                }
+//
+//                Column(
+//                    modifier = Modifier.fillMaxHeight(),
+//                    verticalArrangement = Arrangement.Bottom
+//                ) {
+//                    Text(text = String.format("%.2f", 0.0f))
+//                    Spacer(modifier = Modifier.fillMaxHeight(0.0f))
+//                }
             }
 
             // Y-Axis Line
