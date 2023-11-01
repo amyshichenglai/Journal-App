@@ -21,114 +21,32 @@ import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import androidx.compose.runtime.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.input.pointer.pointerInput
-import com.mohamedrejeb.richeditor.model.RichTextStyle
 
-
-@Composable
-fun myButton(
-    isChoosed: Boolean,
-    choosedColor: Color = MaterialTheme.colorScheme.secondaryContainer,
-    unchoosedColor: Color = Color.Transparent,
-    changeColor: (Boolean) -> Unit,
-    onClick: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(size = 5.dp))
-            .clickable {
-                onClick()
-                changeColor(!isChoosed)
-            }
-            .background(
-                if (isChoosed) { choosedColor } else { unchoosedColor }
-            )
-    ) {
-        content()
-    }
-}
-
-@Composable
-fun DocumentToolbar(
-    onHead: () -> Unit,
-    onBold: () -> Unit,
-    onItalic: () -> Unit,
-    onUndo: () -> Unit,
-    onRedo: () -> Unit
-) {
-    var headChoosed by remember { mutableStateOf(false) }
-    var boldChoosed by remember { mutableStateOf(false) }
-    var italicChoosed by remember { mutableStateOf(false) }
-
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp).focusable(false),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-    ) {
-//        myButton(
-//            isChoosed = headChoosed,
-//            changeColor = {headChoosed = it},
-//            onClick = onHead
-//        ) {
-//            Text(
-//                text = "Head",
-//                modifier = Modifier.padding(3.dp),
-//                color = MaterialTheme.colorScheme.secondary
-//            )
-//        }
-        TextButton(onClick = onHead, modifier = Modifier.focusable(false)) {
-            Text("Head")
-        }
-        TextButton(onClick = onBold, modifier = Modifier.focusable(false)) {
-            Text("Bold")
-        }
-        TextButton(onClick = onItalic, modifier = Modifier.focusable(false)) {
-            Text("Italic")
-        }
-        TextButton(onClick = onUndo, modifier = Modifier.focusable(false)) {
-            Text("Undo")
-        }
-        TextButton(onClick = onRedo, modifier = Modifier.focusable(false)) {
-            Text("Redo")
-        }
-    }
-}
+import com.mohamedrejeb.richeditor.ui.material3.OutlinedRichTextEditor
 
 
 
 @Composable
 fun EditorInterface() {
     val state = rememberRichTextState()
-    val focusRequester = remember { FocusRequester() }
-    Box(
+    val html = "**Compose** *Rich* Editor"
+    state.setMarkdown(html)
+    Column(
         modifier = Modifier.fillMaxSize().padding(14.dp),
-        // contentAlignment = Alignment.TopStart
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
-        DocumentToolbar(
-            onHead = {
-                state.toggleSpanStyle(SpanStyle(fontSize = 23.sp))
-            },
-            onBold = {
-                state.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            },
-            onItalic = {
-                state.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-            },
-            onUndo = {
-                // Implement undo functionality
-            },
-            onRedo = {
-                // Implement redo functionality
-            }
+
+        controlBar(
+            state = state,
         )
 
-        // Toggle a span style.
+        // the place to text
         RichTextEditor(
             state = state,
-            modifier = Modifier.fillMaxSize().padding(top = 55.dp),
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }
