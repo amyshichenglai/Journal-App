@@ -1,11 +1,9 @@
 package note
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
@@ -19,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.richeditor.model.RichTextState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun functionButton(
     onClick: () -> Unit,
@@ -171,7 +168,7 @@ fun controlBar(
             onClick = {
                 state.toggleSpanStyle(
                     SpanStyle(
-                        background = Color.Green
+                        background = Color.Yellow
                     )
                 )
             },
@@ -195,5 +192,12 @@ fun controlBar(
             text = "List Num",
         )
 
+        functionButton(
+            onClick = {
+                val html = "<p><b>Compose Rich Editor</b></p>"
+                state.setHtml(html)
+            },
+            text = "load",
+        )
     }
 }

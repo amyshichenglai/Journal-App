@@ -24,16 +24,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
+import com.mohamedrejeb.richeditor.model.RichTextState
 
 import com.mohamedrejeb.richeditor.ui.material3.OutlinedRichTextEditor
 
 
 
 @Composable
-fun EditorInterface() {
-    val state = rememberRichTextState()
-    val html = "**Compose** *Rich* Editor"
-    state.setMarkdown(html)
+fun EditorInterface(state: RichTextState) {
     Column(
         modifier = Modifier.fillMaxSize().padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(1.dp)
