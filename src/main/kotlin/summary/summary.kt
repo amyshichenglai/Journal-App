@@ -37,12 +37,23 @@ fun formatTimeAs24HourClock(dateTime: LocalDateTime): String {
     return dateTime.format(timeFormatter)
 }
 
+fun getMondayOfCurrentWeek(date: LocalDate): String {
+    val dayOfWeek = date.dayOfWeek.value
+    val monday = date.minusDays((dayOfWeek - 1).toLong())
+    return monday.format(DateTimeFormatter.ofPattern("dd"))
+}
+
+fun getSundayOfCurrentWeek(date: LocalDate): String {
+    val dayOfWeek = date.dayOfWeek.value
+    val sunday = date.plusDays((7 - dayOfWeek).toLong())
+    return sunday.format(DateTimeFormatter.ofPattern("dd"))
+}
 
 @Composable
 fun Summary() {
     var currentDate by remember { mutableStateOf(LocalDate.now()) }
-    var Date1 by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("dd"))) }
-    var Date2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))) }
+    var Date1 by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate)) }
+    var Date2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate)) }
     var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
     var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
     var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
@@ -52,8 +63,8 @@ fun Summary() {
     LaunchedEffect(Unit) {
         while (true) {
             currentDate = LocalDate.now()
-            Date1 = currentDate.format(DateTimeFormatter.ofPattern("dd"))
-            Date2 = currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))
+            Date1 = getMondayOfCurrentWeek(currentDate)
+            Date2 = getSundayOfCurrentWeek(currentDate)
             monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
             currMonth = getMonthName(monthNumber)
             currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
