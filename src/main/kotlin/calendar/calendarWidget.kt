@@ -84,7 +84,7 @@ fun homeCalendar() {
             )
         }
     }
-    events.forEach { println(it) }
+    //events.forEach { println(it) }
     Box(
         modifier = Modifier
             .padding(16.dp)
