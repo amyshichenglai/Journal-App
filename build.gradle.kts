@@ -1,3 +1,6 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.compose
+
 plugins {
     kotlin("jvm") version "1.9.0"
     id("org.jetbrains.compose") version "1.5.3"
@@ -11,14 +14,29 @@ repositories {
 }
 
 dependencies {
-    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03") {
-        exclude(group = "org.jetbrains.compose.material3", module = "material3-desktop")
-    }
     implementation(compose.desktop.currentOs);
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
     implementation("org.jetbrains.compose.material3:material3-desktop:1.5.3")
+    implementation("org.xerial:sqlite-jdbc:3.42.0.0")
+    implementation("org.jetbrains.exposed", "exposed-core", "0.44.0")
+    implementation("org.jetbrains.exposed", "exposed-dao", "0.44.0")
+    implementation("org.jetbrains.exposed", "exposed-jdbc", "0.44.0")
+    implementation("org.xerial:sqlite-jdbc:3.43.2.1")
+    implementation ("org.jetbrains.exposed:exposed-jodatime:0.34.1") // Adjust version as necessary
+    implementation ("joda-time:joda-time:2.10.10") // Adjust version as necessary
 }
+
+
 compose.desktop {
     application {
         mainClass = "MainKt"
+        nativeDistributions {
+            macOS{
+                iconFile.set(File("top.svg"));
+                targetFormats(TargetFormat.Dmg);
+            }
+
+        }
+
     }
 }
