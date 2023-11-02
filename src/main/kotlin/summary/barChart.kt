@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import kotlin.math.round
 
 //barchart
 //https://github.com/developerchunk/BarGraph-JetpackCompose/tree/main/app/src/main/java/com/example/customchar
@@ -129,9 +130,19 @@ fun Chart(
                         .padding(start = barGraphWidth, bottom = 5.dp)
                         .clip(CircleShape)
                         .width(barGraphWidth)
-                        .fillMaxHeight(it.value)
-                        .background(MaterialTheme.colorScheme.primary)
-                )
+                        .fillMaxHeight(it.value/max_value)
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    BoxWithConstraints {
+                        val text = it.value.toString() // You can format the text as needed
+
+                        Text(
+                            text = text,
+                            color = Color.White
+                        )
+                    }
+                }
             }
 
         }
