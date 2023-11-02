@@ -27,6 +27,12 @@ dependencies {
 }
 
 
+tasks.withType<Jar> {
+    from("/Users/seangong/IdeaProjects/CS346-project/src/main/resources/chinook.db") {
+        into("resources")
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -35,7 +41,6 @@ compose.desktop {
                 iconFile.set(File("top.svg"));
                 targetFormats(TargetFormat.Dmg);
             }
-
         }
 
     }
