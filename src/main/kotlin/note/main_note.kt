@@ -45,10 +45,10 @@ fun NotesEditor() {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(0.15f)  // 15% of parent's height
-                .padding(top = 70.dp)
+                .padding(top = 10.dp)
             // other modifiers, content, etc.
         ) {
-            NoteList()
+            NoteList(state)
         }
         Box(
             modifier = Modifier
