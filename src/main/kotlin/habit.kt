@@ -106,7 +106,7 @@ data class TodoItem(
 )
 
 @Composable
-fun CreateTodoDialog(onCreate: (TodoItem) -> Unit) {
+fun CreateTodoDialog(onCreate: (TodoItem) -> Unit,onClose: () -> Unit) {
     var primaryTask by remember { mutableStateOf("") }
     var secondaryTask by remember { mutableStateOf("") }
     var priority by remember { mutableStateOf(1) }
@@ -179,6 +179,16 @@ fun CreateTodoDialog(onCreate: (TodoItem) -> Unit) {
                 }
             ) {
                 Text("Create")
+            }
+        },
+        // Add this part to introduce a close button
+        dismissButton = {
+            Button(
+                onClick = {
+                    onClose() // Closes the dialog when clicked
+                }
+            ) {
+                Text("Close")
             }
         }
     )
@@ -389,7 +399,11 @@ fun ToDoList() {
                 }
             }
             if (isDialogOpen) {
-                CreateTodoDialog(onCreate = { newItem ->
+                CreateTodoDialog(onClose = {
+
+                    isDialogOpen = false
+                },
+                        onCreate = { newItem ->
                     isDialogOpen = false  // Close the dialog
                     transaction {
                         // Insert new item into the database
