@@ -54,7 +54,7 @@ fun getSundayOfCurrentWeek(date: LocalDate): String {
 
 @Composable
 fun Summary() {
-    Database.connect("jdbc:sqlite:chinook.db")
+    Class.forName("org.sqlite.JDBC")
     val todoListFromDb: MutableList<TodoItem> = mutableListOf()
 
     transaction {

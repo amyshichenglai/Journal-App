@@ -20,6 +20,7 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
+
 fun addHoursToTimeString(time: String, hoursToAdd: Int): String {
     // Parse the string to get hours and minutes
     val parts = time.split(":")
@@ -84,7 +85,6 @@ fun homeCalendar() {
             )
         }
     }
-    //events.forEach { println(it) }
     Box(
         modifier = Modifier
             .padding(16.dp)

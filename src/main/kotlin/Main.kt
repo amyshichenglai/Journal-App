@@ -70,6 +70,13 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
+
+import java.util.logging.Logger
+
+val logger = Logger.getLogger("DatabaseLogger")
+
+
+
 @Composable
 fun BoxItem(color: Color, text: String) {
     Box(modifier = Modifier.size(200.dp, 200.dp).background(color)) {
