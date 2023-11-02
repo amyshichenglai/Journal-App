@@ -18,6 +18,9 @@ import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.delay
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -37,12 +40,45 @@ fun formatTimeAs24HourClock(dateTime: LocalDateTime): String {
     return dateTime.format(timeFormatter)
 }
 
+fun getMondayOfCurrentWeek(date: LocalDate): String {
+    val dayOfWeek = date.dayOfWeek.value
+    val monday = date.minusDays((dayOfWeek - 1).toLong())
+    return monday.format(DateTimeFormatter.ofPattern("dd"))
+}
+
+fun getSundayOfCurrentWeek(date: LocalDate): String {
+    val dayOfWeek = date.dayOfWeek.value
+    val sunday = date.plusDays((7 - dayOfWeek).toLong())
+    return sunday.format(DateTimeFormatter.ofPattern("dd"))
+}
 
 @Composable
 fun Summary() {
+    Database.connect("jdbc:sqlite:chinook.db")
+    val todoListFromDb: MutableList<TodoItem> = mutableListOf()
+
+    transaction {
+        TodoTable.selectAll().forEach {
+            todoListFromDb.add(
+                TodoItem(
+                    it[TodoTable.id],
+                    it[TodoTable.primaryTask],
+                    it[TodoTable.secondaryTask],
+                    it[TodoTable.priority],
+                    it[TodoTable.completed],
+                    it[TodoTable.section],
+                    it[TodoTable.datetime],
+                    it[TodoTable.duration]
+                )
+            )
+        }
+    }
+    var completed = todoListFromDb.filter { it.completed == true }
+    val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+
     var currentDate by remember { mutableStateOf(LocalDate.now()) }
-    var Date1 by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("dd"))) }
-    var Date2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))) }
+    var Date1 by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate)) }
+    var Date2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate)) }
     var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
     var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
     var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
@@ -52,8 +88,8 @@ fun Summary() {
     LaunchedEffect(Unit) {
         while (true) {
             currentDate = LocalDate.now()
-            Date1 = currentDate.format(DateTimeFormatter.ofPattern("dd"))
-            Date2 = currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("dd"))
+            Date1 = getMondayOfCurrentWeek(currentDate)
+            Date2 = getSundayOfCurrentWeek(currentDate)
             monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
             currMonth = getMonthName(monthNumber)
             currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
@@ -127,20 +163,25 @@ fun Summary() {
                         .fillMaxWidth(),
                 ) {
                     item {
+                        var monDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "MONDAY" && it.completed == true}.map { it.duration }.sum().toFloat()
+                        var tueDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "TUESDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var wedDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "WEDNESDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var thuDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "THURSDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var friDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "FRIDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var satDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SATURDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var sunDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SUNDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+
                         Chart(
-
                             data = mapOf(
-
-                                Pair("Mon", 0.1f),
-                                Pair("Tue", 0.2f),
-                                Pair("Wed", 0.3f),
-                                Pair("Thu", 0.4f),
-                                Pair("Fri", 0.5f),
-                                Pair("Sat", 0.6f),
-                                Pair("Sun", 0.7f),
-
-
-                                ), barwidth = 30.dp, graphWidth = 530.dp, max_value = 1
+                                Pair("Mon", monDuration),
+                                Pair("Tue", tueDuration),
+                                Pair("Wed", wedDuration),
+                                Pair("Thu", thuDuration),
+                                Pair("Fri", friDuration),
+                                Pair("Sat", satDuration),
+                                Pair("Sun", sunDuration),
+                                ), barwidth = 30.dp, graphWidth = 530.dp,
+                            max_value = listOf(monDuration, tueDuration, wedDuration, thuDuration, friDuration, satDuration, sunDuration).max()
                         )
                     }
                     item {
@@ -164,7 +205,7 @@ fun Summary() {
                         Pair("Week2", 0.2f),
                         Pair("Week3", 0.3f),
                         Pair("Week4", 0.4f),
-                        ), barwidth = 50.dp, graphWidth = 530.dp, max_value = 1
+                        ), barwidth = 50.dp, graphWidth = 530.dp, max_value = 1.0f
                 )
 
                 "Annual" -> Chart(
@@ -184,7 +225,7 @@ fun Summary() {
                         Pair("Nov", 0.7f),
                         Pair("Dec", 0.7f),
 
-                        ), barwidth = 30.dp, graphWidth = 900.dp, max_value = 1
+                        ), barwidth = 30.dp, graphWidth = 900.dp, max_value = 1.0f
                 )
             }
         }
