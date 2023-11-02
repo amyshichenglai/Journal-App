@@ -163,13 +163,13 @@ fun Summary() {
                         .fillMaxWidth(),
                 ) {
                     item {
-                        var monDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "MONDAY"}.map { it.duration }.sum().toFloat()
-                        var tueDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "TUESDAY"}.map { it.duration }.sum().toFloat()
-                        var wedDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "WEDNESDAY"}.map { it.duration }.sum().toFloat()
-                        var thuDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "THURSDAY"}.map { it.duration }.sum().toFloat()
-                        var friDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "FRIDAY"}.map { it.duration }.sum().toFloat()
-                        var satDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SATURDAY"}.map { it.duration }.sum().toFloat()
-                        var sunDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SUNDAY"}.map { it.duration }.sum().toFloat()
+                        var monDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "MONDAY" && it.completed == true}.map { it.duration }.sum().toFloat()
+                        var tueDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "TUESDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var wedDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "WEDNESDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var thuDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "THURSDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var friDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "FRIDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var satDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SATURDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
+                        var sunDuration = todoListFromDb.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SUNDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
 
                         Chart(
                             data = mapOf(
