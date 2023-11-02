@@ -1,5 +1,4 @@
 package note
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -14,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,9 +25,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.style.TextDecoration
 
 @Composable
 fun NotesEditor() {
+    var state = rememberRichTextState()
+    state.setConfig(
+        linkColor = Color.Blue,
+        linkTextDecoration = TextDecoration.Underline,
+        codeColor = Color.Yellow,
+        codeBackgroundColor = Color.Transparent,
+        codeStrokeColor = Color.LightGray,
+    )
+
     Row(
         modifier = Modifier.fillMaxHeight()
     ) {
@@ -37,20 +45,18 @@ fun NotesEditor() {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(0.15f)  // 15% of parent's height
-                .padding(top = 70.dp)
+                .padding(top = 10.dp)
             // other modifiers, content, etc.
         ) {
-            NoteList()
+            NoteList(state)
         }
-
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(0.85f)  // 85% of parent's height
             // other modifiers, content, etc.
         ) {
-            EditorInterface()
+            EditorInterface(state)
         }
     }
 }
-
