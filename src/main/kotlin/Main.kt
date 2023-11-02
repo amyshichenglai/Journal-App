@@ -60,7 +60,13 @@ import ui.theme.md_theme_light_background
 import note.*
 // Sample Composable functions for each section
 
-import note.*import java.sql.Connection
+import note.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.deleteAll
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.transactions.transaction
+import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
@@ -172,6 +178,105 @@ fun main() = application {
             Box(
                 modifier = Modifier.background(MaterialTheme.colorScheme.background)
             ) {
+                Database.connect("jdbc:sqlite:chinook.db")
+//                transaction {
+//                    SchemaUtils.createMissingTablesAndColumns(TodoTable) // Create table if not exists
+//
+//                    // Delete all existing records (Optional, if you want to start fresh)
+//                    TodoTable.deleteAll()
+//
+//                    // Work section
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Write report"
+//                        it[secondaryTask] = "Due next week"
+//                        it[priority] = 1
+//                        it[starttime] = "08:00"
+//                        it[completed] = false
+//                        it[section] = "Work"
+//                        it[duration] = 3
+//                        it[datetime] = "20231030"
+//                    }
+//
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Email client"
+//                        it[secondaryTask] = "Urgent"
+//                        it[priority] = 2
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Work"
+//                        it[duration] = 3
+//                        it[datetime] = "20231029"
+//                    }
+//
+//                    // Study section
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Study for exam"
+//                        it[secondaryTask] = "Chapter 1-5"
+//                        it[priority] = 1
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Study"
+//                        it[duration] = 3
+//                        it[datetime] = "20231030"
+//                    }
+//
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Complete assignment"
+//                        it[secondaryTask] = "Submit online"
+//                        it[priority] = 2
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Study"
+//                        it[duration] = 3
+//                        it[datetime] = "20231030"
+//                    }
+//
+//                    // Hobby section
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Learn guitar"
+//                        it[secondaryTask] = "Practice chords"
+//                        it[priority] = 3
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Hobby"
+//                        it[duration] = 3
+//                        it[datetime] = "20231030"
+//                    }
+//
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Go fishing"
+//                        it[secondaryTask] = "This weekend"
+//                        it[priority] = 4
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Hobby"
+//                        it[duration] = 3
+//                        it[datetime] = "20231030"
+//                    }
+//
+//                    // Life section
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Buy groceries"
+//                        it[secondaryTask] = "Fruits, Vegetables"
+//                        it[priority] = 3
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Life"
+//                        it[duration] = 3
+//                        it[datetime] = "20231030"
+//                    }
+//
+//                    TodoTable.insert {
+//                        it[primaryTask] = "Call mom"
+//                        it[secondaryTask] = "Weekend catchup"
+//                        it[priority] = 4
+//                        it[completed] = false
+//                        it[starttime] = "08:00"
+//                        it[section] = "Life"
+//                        it[duration] = 1
+//                        it[datetime] = "20231028"
+//                    }
+//                }
                 AppLayout()
             }
         }
