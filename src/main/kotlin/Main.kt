@@ -3,8 +3,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import java.io.FileInputStream
-import java.io.InputStream
 import ui.theme.AppTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,8 +32,6 @@ import androidx.compose.ui.window.singleWindowApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.xml.sax.InputSource
-import java.io.File
-import java.io.IOException
 import androidx.compose.ui.window.*
 import java.awt.Dimension
 import androidx.compose.ui.window.Window
@@ -66,6 +62,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.*
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
@@ -76,7 +73,19 @@ import java.util.logging.Logger
 val logger = Logger.getLogger("DatabaseLogger")
 
 
+fun getDatabasePath(): String {
+    val dbFileName = "chinook.db"
 
+    // Check if a typical development directory/file exists
+    val isDevelopment = File(".gradle").exists()
+
+    return if (isDevelopment) {
+        "jdbc:sqlite:$dbFileName"
+    } else {
+        val appDir = System.getProperty("user.dir")
+        "jdbc:sqlite:$appDir/$dbFileName"
+    }
+}
 @Composable
 fun BoxItem(color: Color, text: String) {
     Box(modifier = Modifier.size(200.dp, 200.dp).background(color)) {
@@ -176,6 +185,35 @@ fun AppLayout() {
     }
 }
 
+
+class DatabaseManager {
+    fun setupDatabase(): Database {
+        val dbName = "chinook.db"
+        val persistentDir = File(System.getProperty("user.home"), ".myApp")
+        val persistentDBFile = File(persistentDir, dbName)
+        // Check if the database file exists in a persistent location
+        if (!persistentDBFile.exists()) {
+            // Ensure the directory exists
+            persistentDir.mkdirs()
+            // Copy the database from the resources to the persistent location
+            val resourceStream = this::class.java.getResourceAsStream("/$dbName")
+            FileOutputStream(persistentDBFile).use { output ->
+                resourceStream.copyTo(output)
+            }
+        }
+
+        // Load SQLite JDBC driver (required for some configurations)
+        Class.forName("org.sqlite.JDBC")
+
+        // Connect to the SQLite database in the persistent location
+        val connectionUrl = "jdbc:sqlite:${persistentDBFile.absolutePath}"
+        return Database.connect(connectionUrl)
+    }
+}
+
+
+
+
 fun main() = application {
     val window = Window(
         onCloseRequest = ::exitApplication, title = "My Journal"
@@ -185,7 +223,9 @@ fun main() = application {
             Box(
                 modifier = Modifier.background(MaterialTheme.colorScheme.background)
             ) {
-                Database.connect("jdbc:sqlite:chinook.db")
+                val manager = DatabaseManager()
+                val db = manager.setupDatabase()
+
 //                transaction {
 //                    SchemaUtils.createMissingTablesAndColumns(TodoTable) // Create table if not exists
 //
