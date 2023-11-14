@@ -98,13 +98,14 @@ object TodoTable : Table() {
     val section = varchar("section", 255)
     val duration = integer("duration")
     val starttime = varchar("starttime", 255)
+    val completecnt = integer("completecnt")
     override val primaryKey = PrimaryKey(id, name = "PK_User_ID")
 }
 
 data class TodoItem(
     val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
     var completed: Boolean, val section: String, val date_time: String, val start_time: String,
-    val duration: String
+    val duration: String, val completecnt: Int
 )
 
 @Composable
@@ -118,6 +119,7 @@ fun CreateTodoDialog(onCreate: (TodoItem) -> Unit,onClose: () -> Unit) {
     var isDateValid by remember { mutableStateOf(true) }
     var areFieldsValid by remember { mutableStateOf(true) }
     var duration_in by remember { mutableStateOf("") }
+    var completecnt by remember { mutableStateOf(0) }
 
     AlertDialog(
         onDismissRequest = { /* dismiss dialog */ },
@@ -188,7 +190,8 @@ fun CreateTodoDialog(onCreate: (TodoItem) -> Unit,onClose: () -> Unit) {
                                 section = section,
                                 date_time = dueDate,
                                 duration = duration_in,
-                                start_time = start_time
+                                start_time = start_time,
+                                completecnt = 0
                             )
                         )
                     }
@@ -243,7 +246,7 @@ fun ToDoList() {
                         it[TodoTable.completed],
                         it[TodoTable.section],
                         it[TodoTable.datetime],
-                        "null", "2"
+                        "null", "2", 0
                     )
                 )
             }
@@ -303,7 +306,9 @@ fun ToDoList() {
                             trailingContent = { Text("Priority ${todoItem.priority}") },
                             leadingContent = {
                                 Checkbox(checked = todoItem.completed, onCheckedChange = { isChecked ->
-                                    todoListFromDb[index] = todoListFromDb[index].copy(completed = isChecked)
+                                    todoListFromDb[index] = todoListFromDb[index].copy(
+                                        completed = isChecked
+                                    )
 
                                     // Update database
                                     transaction {
@@ -344,6 +349,7 @@ fun ToDoList() {
                             it[datetime] = newItem.date_time
                             it[duration] = newItem.duration.toInt()
                             it[starttime] = newItem.start_time
+                            it[completecnt] = 0
                         }
                         print(newItem.date_time)
                         // Add new item to the list
