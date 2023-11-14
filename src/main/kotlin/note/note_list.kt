@@ -1,5 +1,6 @@
 package note
 
+import DatabaseManager
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.richeditor.model.RichTextState
 
 import androidx.compose.runtime.saveable.rememberSaveable
+import getDatabasePath
+
 
 
 import java.sql.Connection
@@ -71,7 +74,8 @@ data class FileItem(
 
 @Composable
 fun CreateFileDialog(onCreate: (FileItem) -> Unit) {
-    //Database.connect("jdbc:sqlite:chinook.db")
+    val manager = DatabaseManager()
+    val db = manager.setupDatabase()
     var id by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
@@ -115,7 +119,8 @@ fun CreateFileDialog(onCreate: (FileItem) -> Unit) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NoteList(state: RichTextState) {
-    Database.connect("jdbc:sqlite:chinook.db")
+    val manager = DatabaseManager()
+val db = manager.setupDatabase()
     transaction {
         SchemaUtils.create(FilesTable)
     }
