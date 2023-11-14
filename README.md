@@ -37,8 +37,8 @@ Amy Lai  (s29lai@uwaterloo.ca)
 - Productive Week: a total of 50 hrs focused time
 - Work Maniac: 40 hrs of Work
 - Knowledge Sponge: 40 hrs of Study tasks
-- Jack of All Trades: 10 Hobby tasks completed
-- Life Hacker: 40 hrs of Life tasks
+- Jack of All Trades: 10 hrs of Hobby tasks completed
+- Life Hacker: 10 hrs of Life tasks
 
 ### Monthly
 
