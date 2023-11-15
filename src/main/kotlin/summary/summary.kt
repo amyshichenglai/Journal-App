@@ -40,16 +40,23 @@ fun formatTimeAs24HourClock(dateTime: LocalDateTime): String {
     return dateTime.format(timeFormatter)
 }
 
-fun getMondayOfCurrentWeek(date: LocalDate): String {
+fun getMondayOfCurrentWeek(date: LocalDate): Pair<String, String> {
     val dayOfWeek = date.dayOfWeek.value
     val monday = date.minusDays((dayOfWeek - 1).toLong())
-    return monday.format(DateTimeFormatter.ofPattern("dd"))
+    val target_string =  monday.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    println(target_string)
+    val month = target_string.substring(4,6)
+    val date = target_string.substring(6,8)
+    return Pair(month, date)
 }
 
-fun getSundayOfCurrentWeek(date: LocalDate): String {
+fun getSundayOfCurrentWeek(date: LocalDate): Pair<String,String> {
     val dayOfWeek = date.dayOfWeek.value
     val sunday = date.plusDays((7 - dayOfWeek).toLong())
-    return sunday.format(DateTimeFormatter.ofPattern("dd"))
+    val target_string =  sunday.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    val month = target_string.substring(4,6)
+    val date = target_string.substring(6,8)
+    return Pair(month, date)
 }
 
 @Composable
@@ -73,25 +80,31 @@ fun Summary() {
             )
         }
     }
+
+    val (monday_month, monday_day) = getMondayOfCurrentWeek(currentDate)
+    val (sunday_month, sunday_day) = getSundayOfCurrentWeek(currentDate)
+
     var completed = todoListFromDb.filter { it.completed == true }
     val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
     var currentDate by remember { mutableStateOf(LocalDate.now()) }
-    var Date1 by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate)) }
-    var Date2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate)) }
+    var Date1 by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate).second) }
+    var Date2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate).second) }
     var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
-    var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
+    var currMonth by remember {mutableStateOf(getMondayOfCurrentWeek(currentDate).first)  }
+    var currMonth2 by remember {mutableStateOf(getSundayOfCurrentWeek(currentDate).first) }
     var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
-    var currMonth2 by remember { mutableStateOf(getMonthName(monthNumber2)) }
+
     var currYear by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("yyyy"))) }
 
     LaunchedEffect(Unit) {
         while (true) {
             currentDate = LocalDate.now()
-            Date1 = getMondayOfCurrentWeek(currentDate)
-            Date2 = getSundayOfCurrentWeek(currentDate)
-            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
-            currMonth = getMonthName(monthNumber)
+            Date1 = getMondayOfCurrentWeek(currentDate).second
+            Date2 = getSundayOfCurrentWeek(currentDate).second
+//            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
+            currMonth = getMondayOfCurrentWeek(currentDate).first
+            currMonth2 = getSundayOfCurrentWeek(currentDate).first
             currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
             delay(1000) // Update every second or as needed
         }
@@ -121,7 +134,7 @@ fun Summary() {
             ) {
                 when (selectedSection) {
                     "Weekly" -> Text(
-                        text = "Week of " + currMonth + " " + Date1 + " - " + currMonth2 + " " + Date2,
+                        text = "Week of " + getMonthName(currMonth.toInt()-1) + " " + Date1 + " - " + getMonthName(currMonth2.toInt()-1) + " " + Date2,
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
