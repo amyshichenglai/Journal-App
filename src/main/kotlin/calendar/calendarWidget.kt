@@ -89,7 +89,7 @@ val db = manager.setupDatabase()
     Box(
         modifier = Modifier
             .padding(16.dp)
-            .size(250.dp, 400.dp) // Adjust these values as per your desired size
+            .size(2500.dp, 400.dp) // Adjust these values as per your desired size
             .background(Color(0xFFede6fa)), // Optional: If you want a background color
              contentAlignment = Alignment.TopEnd
     ) {

@@ -24,15 +24,13 @@ fun Achievement(
     eventsInRange: List<TodoItem>,
     factor: Int
 ) {
-
     val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
     var workWeekDuration = eventsInRange.filter{ it.section == "Work" && it.completed == true}.map { it.duration }.sum().toFloat()
     var studyWeekDuration = eventsInRange.filter{ it.section == "Study" && it.completed == true}.map { it.duration }.sum().toFloat()
     var hobbyWeekDuration = eventsInRange.filter{ it.section == "Hobby" && it.completed == true}.map { it.duration }.sum().toFloat()
     var lifeWeekDuration = eventsInRange.filter{ it.section == "Life" && it.completed == true}.map { it.duration }.sum().toFloat()
-
-    val todaysEvents = eventsInRange.filter{it.datetime == currentDate.toString() && it.completecnt >= 21}
+//    val todaysEvents = eventsInRange.filter{it.datetime == currentDate.toString() && it.completecnt >= 21}
     var habitsCompletedWeekly: MutableList<String> = mutableListOf()
 
     if (workWeekDuration >= 40 * factor) {
@@ -45,9 +43,9 @@ fun Achievement(
         habitsCompletedWeekly.add("Life Hacker")
     }
 
-    todaysEvents.forEach {
-        habitsCompletedWeekly.add("Habit \"" + it.primaryTask + "\" Completed")
-    }
+//    todaysEvents.forEach {
+//        habitsCompletedWeekly.add("Habit \"" + it.primaryTask + "\" Completed")
+//    }
 
     Column {
         Text(
