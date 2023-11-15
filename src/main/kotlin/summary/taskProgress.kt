@@ -21,7 +21,7 @@ import kotlin.random.Random
 
 data class TodoItem(
     val id: Int, val primaryTask: String, val secondaryTask: String, val priority: Int,
-    var completed: Boolean, val section: String, val datetime: String, val duration: Int, var completecnt: Int
+    var completed: Boolean, val section: String, val datetime: String, val duration: Int
 )
 
 @Composable
@@ -45,8 +45,7 @@ fun TaskProgress(
                     it[TodoTable.completed],
                     it[TodoTable.section],
                     it[TodoTable.datetime],
-                    it[TodoTable.duration],
-                    it[TodoTable.completecnt]
+                    it[TodoTable.duration]
                 )
             )
         }

@@ -41,16 +41,22 @@ fun formatTimeAs24HourClock(dateTime: LocalDateTime): String {
     return dateTime.format(timeFormatter)
 }
 
-fun getMondayOfCurrentWeek(date: LocalDate): String {
+fun getMondayOfCurrentWeek(date: LocalDate): Pair<String, String> {
     val dayOfWeek = date.dayOfWeek.value
     val monday = date.minusDays((dayOfWeek - 1).toLong())
-    return monday.format(DateTimeFormatter.ofPattern("dd"))
+    val target_string = monday.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    val month = target_string.substring(4, 6)
+    val date = target_string.substring(6, 8)
+    return Pair(month, date)
 }
 
-fun getSundayOfCurrentWeek(date: LocalDate): String {
+fun getSundayOfCurrentWeek(date: LocalDate): Pair<String, String> {
     val dayOfWeek = date.dayOfWeek.value
     val sunday = date.plusDays((7 - dayOfWeek).toLong())
-    return sunday.format(DateTimeFormatter.ofPattern("dd"))
+    val target_string = sunday.format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    val month = target_string.substring(4, 6)
+    val date = target_string.substring(6, 8)
+    return Pair(month, date)
 }
 
 @Composable
@@ -69,16 +75,21 @@ fun Summary() {
                     it[TodoTable.completed],
                     it[TodoTable.section],
                     it[TodoTable.datetime],
-                    it[TodoTable.duration],
-                    it[TodoTable.completecnt]
+                    it[TodoTable.duration]
                 )
             )
         }
     }
 
+    val (monday_month, monday_day) = getMondayOfCurrentWeek(currentDate)
+    val (sunday_month, sunday_day) = getSundayOfCurrentWeek(currentDate)
+
+    var completed = todoListFromDb.filter { it.completed == true }
+
     val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     val currentWeekStartDate = currentDate.minusDays(currentDate.dayOfWeek.value.toLong() - 1)
-    val currentWeekTable = todoListFromDb.filter{LocalDate.parse(it.datetime, formatter) in currentWeekStartDate..currentDate}
+    val currentWeekTable =
+        todoListFromDb.filter { LocalDate.parse(it.datetime, formatter) in currentWeekStartDate..currentDate }
 
 
 // Current Month
@@ -97,21 +108,27 @@ fun Summary() {
     }
 
     var currentDate by remember { mutableStateOf(LocalDate.now()) }
-    var Date1 by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate)) }
-    var Date2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate)) }
+    var Date1 by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate).second) }
+    var Date2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate).second) }
     var monthNumber by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
-    var currMonth by remember { mutableStateOf(getMonthName(monthNumber)) }
-    var monthNumber2 by remember { mutableStateOf(currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1) }
-    var currMonth2 by remember { mutableStateOf(getMonthName(monthNumber2)) }
+    var currMonth by remember { mutableStateOf(getMondayOfCurrentWeek(currentDate).first) }
+    var currMonth2 by remember { mutableStateOf(getSundayOfCurrentWeek(currentDate).first) }
+    var monthNumber2 by remember {
+        mutableStateOf(
+            currentDate.plusDays(7).format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
+        )
+    }
+
     var currYear by remember { mutableStateOf(currentDate.format(DateTimeFormatter.ofPattern("yyyy"))) }
 
     LaunchedEffect(Unit) {
         while (true) {
             currentDate = LocalDate.now()
-            Date1 = getMondayOfCurrentWeek(currentDate)
-            Date2 = getSundayOfCurrentWeek(currentDate)
-            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
-            currMonth = getMonthName(monthNumber)
+            Date1 = getMondayOfCurrentWeek(currentDate).second
+            Date2 = getSundayOfCurrentWeek(currentDate).second
+//            monthNumber = currentDate.format(DateTimeFormatter.ofPattern("MM")).toInt() - 1
+            currMonth = getMondayOfCurrentWeek(currentDate).first
+            currMonth2 = getSundayOfCurrentWeek(currentDate).first
             currYear = currentDate.format(DateTimeFormatter.ofPattern("yyyy"))
             delay(1000) // Update every second or as needed
         }
@@ -120,6 +137,7 @@ fun Summary() {
     var progress by remember { mutableStateOf(0.1f) }
     var selectedSection by remember { mutableStateOf("Weekly") }
     var habit by remember { mutableStateOf("All") }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -138,10 +156,14 @@ fun Summary() {
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
+
             ) {
+
                 when (selectedSection) {
                     "Weekly" -> Text(
-                        text = "Week of " + currMonth + " " + Date1 + " - " + currMonth2 + " " + Date2,
+                        text = "Week of " + getMonthName(currMonth.toInt() - 1) + " " + Date1 + " - " +
+                                getMonthName(currMonth2.toInt() - 1) + " " + Date2,
+
                         fontFamily = FontFamily.Cursive,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
@@ -190,7 +212,7 @@ fun Summary() {
                         var friDuration = currentWeekTable.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "FRIDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
                         var satDuration = currentWeekTable.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SATURDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
                         var sunDuration = currentWeekTable.filter{ LocalDate.parse(it.datetime, formatter).dayOfWeek.toString() == "SUNDAY"&& it.completed == true}.map { it.duration }.sum().toFloat()
-
+                        println(monDuration)
                         Chart(
                             data = mapOf(
                                 Pair("Mon", monDuration),
@@ -200,10 +222,19 @@ fun Summary() {
                                 Pair("Fri", friDuration),
                                 Pair("Sat", satDuration),
                                 Pair("Sun", sunDuration),
-                                ), barwidth = 30.dp, graphWidth = 530.dp,
-                            max_value = listOf(monDuration, tueDuration, wedDuration, thuDuration, friDuration, satDuration, sunDuration).max()
+//                                Pair("Mon", monDuration),
+//                                Pair("Tue", tueDuration),
+//                                Pair("Wed", wedDuration),
+//                                Pair("Thu", thuDuration),
+//                                Pair("Fri", friDuration),
+//                                Pair("Sat", satDuration),
+//                                Pair("Sun", sunDuration),
+                            ), barwidth = 30.dp, graphWidth = 530.dp,
+                            max_value = 0.3f
+//                            listOf(monDuration, tueDuration, wedDuration, thuDuration, friDuration, satDuration, sunDuration).max()
                         )
                     }
+
                     item {
                         Column {
                             HabitSelection(habit) { newSection ->
@@ -211,104 +242,114 @@ fun Summary() {
                             }
                             HabitCheck(habit)
                         }
-
                     }
+//                }
 
+//                "Monthly" -> {
+//                    var maxvalue = 0.0f
+//                    val groupedByDateTime = currentMonthTable
+//                        .groupBy { it.datetime.substring(6, 8) }
+//                        .mapValues { (_, events) ->
+//                            events.filter { it.completed }
+//                                .sumOf { it.duration }
+//                                .toFloat()
+//                        }
+//                    groupedByDateTime.forEach { _, sumDuration ->
+//                        if (sumDuration > maxvalue) {
+//                            maxvalue = sumDuration
+//                        }
+//                    }
+//                    val resultMap = groupedByDateTime.map { (datetime, sumDuration) ->
+//                        Pair(datetime.toString(), sumDuration.toFloat())
+//                    }.toMap()
 
-                }
+//                    Chart(
+//                        data = resultMap,
+//                        barwidth = 50.dp, graphWidth = 530.dp, max_value = maxvalue
+//                    )
+//                }
 
+//                "Annual" -> {
+//                    val janDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.JANUARY && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val febDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.FEBRUARY && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val marDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.MARCH && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val aprDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.APRIL && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val mayDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.MAY && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val junDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.JUNE && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val julDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.JULY && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val augDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.AUGUST && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val sepDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.SEPTEMBER && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val octDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.OCTOBER && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val novDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.NOVEMBER && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//                    val decDuration = currentWeekTable.filter {
+//                        LocalDate.parse(it.datetime, formatter).month == Month.DECEMBER && it.completed
+//                    }.sumOf { it.duration }.toFloat()
+//
+//                    Chart(
+//
+//                        data = mapOf(
+//
+//                            Pair("Jan", janDuration),
+//                            Pair("Feb", febDuration),
+//                            Pair("Mar", marDuration),
+//                            Pair("Apr", aprDuration),
+//                            Pair("May", mayDuration),
+//                            Pair("Jun", junDuration),
+//                            Pair("Jul", julDuration),
+//                            Pair("Aug", augDuration),
+//                            Pair("Sep", sepDuration),
+//                            Pair("Oct", octDuration),
+//                            Pair("Nov", novDuration),
+//                            Pair("Dec", decDuration),
+//
+//                            ), barwidth = 30.dp, graphWidth = 900.dp,
+//                        max_value = listOf(
+//                            janDuration,
+//                            febDuration,
+//                            marDuration,
+//                            aprDuration,
+//                            mayDuration,
+//                            junDuration,
+//                            julDuration,
+//                            augDuration,
+//                            sepDuration,
+//                            octDuration,
+//                            novDuration,
+//                            decDuration
+//                        ).max()
+//                    )
 
-                "Monthly" -> {
-                    var maxvalue = 0.0f
-                    val groupedByDateTime = currentMonthTable
-                        .groupBy { it.datetime.substring(6, 8)}
-                        .mapValues { (_, events) ->
-                            events.filter { it.completed }
-                                .sumOf { it.duration }
-                                .toFloat()
-                        }
-                    groupedByDateTime.forEach { _, sumDuration ->
-                        if (sumDuration > maxvalue) {
-                            maxvalue = sumDuration
-                        }
-                    }
-                    val resultMap = groupedByDateTime.map { (datetime, sumDuration) ->
-                        Pair(datetime, sumDuration)
-                    }.toMap()
-
-                    Chart(
-                        data = resultMap,
-                        barwidth = 50.dp, graphWidth = 530.dp, max_value = maxvalue
-                    )
-                }
-
-                "Annual" -> {
-                    val janDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.JANUARY && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val febDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.FEBRUARY && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val marDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.MARCH && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val aprDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.APRIL && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val mayDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.MAY && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val junDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.JUNE && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val julDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.JULY && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val augDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.AUGUST && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val sepDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.SEPTEMBER && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val octDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.OCTOBER && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val novDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.NOVEMBER && it.completed
-                    }.sumOf { it.duration }.toFloat()
-                    val decDuration = currentWeekTable.filter {
-                        LocalDate.parse(it.datetime, formatter).month == Month.DECEMBER && it.completed
-                    }.sumOf { it.duration }.toFloat()
-
-                    Chart(
-
-                        data = mapOf(
-
-                            Pair("Jan", janDuration),
-                            Pair("Feb", febDuration),
-                            Pair("Mar", marDuration),
-                            Pair("Apr", aprDuration),
-                            Pair("May", mayDuration),
-                            Pair("Jun", junDuration),
-                            Pair("Jul", julDuration),
-                            Pair("Aug", augDuration),
-                            Pair("Sep", sepDuration),
-                            Pair("Oct", octDuration),
-                            Pair("Nov", novDuration),
-                            Pair("Dec", decDuration),
-
-                            ), barwidth = 30.dp, graphWidth = 900.dp,
-                        max_value = listOf(janDuration, febDuration, marDuration, aprDuration, mayDuration, junDuration, julDuration, augDuration, sepDuration, octDuration, novDuration, decDuration).max()
-                    )
                 }
             }
         }
-
         item {
             when (selectedSection) {
+
                 "Weekly" -> Achievement(currentWeekTable, 1)
-                "Monthly" -> Achievement(currentMonthTable, 4)
-                "Annual" -> Achievement(currentYearTable, 48)
+//                "Monthly" -> Achievement(currentMonthTable, 4)
+//                "Annual" -> Achievement(currentYearTable, 48)
             }
         }
     }

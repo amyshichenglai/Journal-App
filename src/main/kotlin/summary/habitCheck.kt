@@ -43,8 +43,7 @@ fun HabitCheck(habit: String) {
                     it[TodoTable.completed],
                     it[TodoTable.section],
                     it[TodoTable.datetime],
-                    it[TodoTable.duration],
-                    it[TodoTable.completecnt]
+                    it[TodoTable.duration]
                 )
             )
         }
