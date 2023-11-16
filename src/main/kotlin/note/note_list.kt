@@ -57,7 +57,7 @@ data class FolderItem(
 )
 
 @Composable
-fun CreateFileDialog(folder: String, onCreate: (FileItem) -> Unit) {
+fun CreateFileDialog(folder: String, onCreate: (FileItem) -> Unit, onClose: () -> Unit) {
     //Database.connect("jdbc:sqlite:chinook.db")
     var name by remember { mutableStateOf("") }
 
@@ -85,12 +85,21 @@ fun CreateFileDialog(folder: String, onCreate: (FileItem) -> Unit) {
             ) {
                 Text("Create")
             }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onClose()
+                }
+            ) {
+                Text("Close")
+            }
         }
     )
 }
 
 @Composable
-fun CreateFolderDialog(parentFolder: String, onCreate: (FolderItem) -> Unit) {
+fun CreateFolderDialog(parentFolder: String, onCreate: (FolderItem) -> Unit, onClose: () -> Unit) {
     //Database.connect("jdbc:sqlite:chinook.db")
     var name by remember { mutableStateOf("") }
 
@@ -118,6 +127,15 @@ fun CreateFolderDialog(parentFolder: String, onCreate: (FolderItem) -> Unit) {
             ) {
                 Text("Create")
             }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onClose()
+                }
+            ) {
+                Text("Close")
+            }
         }
     )
 }
@@ -130,8 +148,6 @@ fun NoteList(state: RichTextState): Pair<Boolean, List<String>> {
     Database.connect("jdbc:sqlite:chinook.db")
     transaction {
         SchemaUtils.create(Table__File)
-
-
         SchemaUtils.create(Folders__Table)
     }
     val idList = remember { mutableStateListOf<String>()}
@@ -319,7 +335,7 @@ fun NoteList(state: RichTextState): Pair<Boolean, List<String>> {
                 } else {
                     str = currentFolder
                 }
-                Text(str)
+                Text("Folder: " + str)
             }
 
         }
@@ -452,7 +468,8 @@ fun NoteList(state: RichTextState): Pair<Boolean, List<String>> {
                         }
                         print(Table__File.selectAll().count())
                     }
-                }
+                },
+                onClose = { isDialogOpen = false }
             )
         }
 
@@ -470,7 +487,8 @@ fun NoteList(state: RichTextState): Pair<Boolean, List<String>> {
                         }
                         print(Folders__Table.selectAll().count())
                     }
-                }
+                },
+                onClose = { isDialogOpen = false }
             )
         }
 
