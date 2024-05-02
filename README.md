@@ -1,16 +1,39 @@
 # CS346 Project
 
 # My Journal App
+A multi-purpose planner application to track daily activities.
 
-## Goal
-Develop a single, multi-purpose planner application to track daily activities.
-
-## Team Members
+## Contributors
 Shutang Gong\
 Shaojun Chen\
 Amy Lai\
 Sherlock Yang
 
+## Installation Instructions
+
+#### On Mac
+1. **Install Docker**:
+  - Visit the [Docker website](https://hub.docker.com/) to download the installer.
+  - Install and launch Docker. Ensure it's running before proceeding.
+2. **Run the Server**:
+  - Download the server image: `docker pull orasean/ktor-server`
+  - Start the server: `docker run -p 8080:8080 orasean/ktor-server`
+3. **Install the App**:
+  - Open the `.dmg` file and drag the application to the Applications folder.
+  - Launch Planify from the Launchpad.
+  - Ensure the server is running before starting the app.
+
+#### On Windows
+1. **Install Docker**:
+  - Download Docker from [here](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe).
+  - Install and open Docker, ensuring it is active.
+2. **Run the Server**:
+  - Download the server image: `docker pull orasean/ktorserver-image`
+  - Start the server: `docker run -p 8080:8080 orasean/ktorserver-image`
+3. **Install the App**:
+  - Execute the `.msi` installer and follow the prompts.
+  - Launch Planify from the Start Menu or the installation directory.
+  - The server should be active prior to using the app.
 
 ## Quick-Start Instructions
 - View the progress of your day in the Home page
